@@ -1,0 +1,123 @@
+
+<div class="login-page">
+
+  <main class="login-main">
+
+    <div class="login-content">
+
+      <!-- LOGO -->
+      <header class="login-header">
+        <div class="logo">BS</div>
+      </header>
+
+      <!-- CARD -->
+      <section class="login-card">
+
+        <div class="login-title">
+          <h2>Bom ter você de volta.</h2>
+          <p>Entre com seus dados para continuar.</p>
+        </div>
+
+        <form class="login-form" (ngSubmit)="logar()">
+
+          <!-- E-MAIL -->
+          <div class="form-group">
+            <label for="email">E-mail</label>
+
+            <mdb-form-control class="field-control">
+              <input
+                mdbInput
+                type="email"
+                id="email"
+                name="email"
+                class="form-control login-input"
+                placeholder="seuemail@exemplo.com"
+                autocomplete="email"
+                [(ngModel)]="usuario"
+                [disabled]="carregando"
+                required
+              />
+            </mdb-form-control>
+          </div>
+
+          <!-- SENHA -->
+          <div class="form-group">
+            <label for="senha">Senha</label>
+
+            <mdb-form-control class="field-control">
+              <div class="password-container">
+
+                <input
+                  mdbInput
+                  type="password"
+                  id="senha"
+                  name="senha"
+                  class="form-control login-input"
+                  placeholder="Digite sua senha"
+                  autocomplete="current-password"
+                  [(ngModel)]="senha"
+                  [disabled]="carregando"
+                  required
+                />
+
+                <span class="eye-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <path
+                      d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"
+                      stroke="currentColor"
+                      stroke-width="1.8"
+                    />
+                    <circle
+                      cx="12"
+                      cy="12"
+                      r="3"
+                      stroke="currentColor"
+                      stroke-width="1.8"
+                    />
+                  </svg>
+                </span>
+
+              </div>
+            </mdb-form-control>
+          </div>
+
+          <!-- MENSAGEM DE ERRO -->
+          @if (mensagemErro) {
+            <p class="login-error" role="alert">
+              {{ mensagemErro }}
+            </p>
+          }
+
+          <!-- BOTÃO -->
+          <button
+            type="submit"
+            class="login-button"
+            mdbRipple
+            [disabled]="carregando"
+          >
+            {{ carregando ? 'Entrando...' : 'Entrar' }}
+            <span class="arrow">→</span>
+          </button>
+
+        </form>
+
+      </section>
+
+    </div>
+
+  </main>
+
+  <!-- RODAPÉ -->
+  <footer class="login-footer">
+
+    <div class="footer-links">
+      <span>Privacidade</span>
+      <span>•</span>
+      <span>Precisa de ajuda?</span>
+    </div>
+
+    <p>© 2026 BS. Todos os direitos reservados.</p>
+
+  </footer>
+
+</div>

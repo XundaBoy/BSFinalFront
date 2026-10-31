@@ -1,0 +1,140 @@
+
+<aside class="sidebar">
+
+  <!-- LOGO -->
+  <div class="sidebar-header">
+    <div class="logo">BS</div>
+    <span class="logo-subtitle">FINANCEIRO</span>
+  </div>
+
+  <!-- NAVEGAÇÃO -->
+  <nav
+    class="sidebar-navigation"
+    aria-label="Menu principal"
+  >
+
+    <p class="menu-label">SEU PAINEL</p>
+
+    <!-- VISÃO GERAL -->
+    <a
+      routerLink="/otc/inicio"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+      class="menu-item"
+    >
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.8"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <rect x="3" y="3" width="7" height="7" rx="1"/>
+        <rect x="14" y="3" width="7" height="7" rx="1"/>
+        <rect x="3" y="14" width="7" height="7" rx="1"/>
+        <rect x="14" y="14" width="7" height="7" rx="1"/>
+      </svg>
+
+      <span>Visão geral</span>
+    </a>
+
+    <!-- ENTRADAS -->
+    <a
+      routerLink="/otc/entradas"
+      routerLinkActive="active"
+      class="menu-item"
+    >
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.8"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M4 17L10 11L14 15L21 8"/>
+        <path d="M15 8H21V14"/>
+      </svg>
+
+      <span>Entradas</span>
+    </a>
+
+    <!-- SAÍDAS -->
+    <a
+      routerLink="/otc/saidas"
+      routerLinkActive="active"
+      class="menu-item"
+    >
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.8"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M4 7L10 13L14 9L21 16"/>
+        <path d="M15 16H21V10"/>
+      </svg>
+
+      <span>Saídas</span>
+    </a>
+
+    <!-- EXTRATO -->
+    <a
+      routerLink="/otc/extrato"
+      routerLinkActive="active"
+      class="menu-item"
+    >
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.8"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <rect x="5" y="3" width="14" height="18" rx="2"/>
+        <path d="M9 8H15M9 12H15M9 16H13"/>
+      </svg>
+
+      <span>Extrato</span>
+    </a>
+
+  </nav>
+
+  <!-- RODAPÉ DO MENU -->
+  <div class="sidebar-footer">
+
+    <!-- SAIR DA CONTA -->
+    <a
+      routerLink="/login"
+      class="menu-item logout"
+    >
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.8"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M9 4H5C3.9 4 3 4.9 3 6V18C3 19.1 3.9 20 5 20H9"/>
+        <path d="M14 16L18 12L14 8"/>
+        <path d="M18 12H9"/>
+      </svg>
+
+      <span>Sair da conta</span>
+    </a>
+
+    <p>BS • Controle financeiro</p>
+
+  </div>
+
+</aside>

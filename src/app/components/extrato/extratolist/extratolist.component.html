@@ -1,0 +1,379 @@
+
+<div class="extrato-page">
+
+  <!-- CABEÇALHO -->
+  <header class="topbar">
+    <div class="breadcrumb">
+      <span>Financeiro</span>
+      <span class="separator">›</span>
+      <strong>Extrato</strong>
+    </div>
+  </header>
+
+  <main class="page-content">
+
+    <!-- TÍTULO -->
+    <section class="page-heading">
+
+      <h1>Extrato financeiro</h1>
+
+      <p>
+        Acompanhe suas movimentações e consulte
+        o saldo acumulado.
+      </p>
+
+    </section>
+
+    <!-- CARREGAMENTO -->
+    <p
+      *ngIf="carregando"
+      role="status"
+      style="color: #6355d9; font-size: 12px; margin: 0;"
+    >
+      Carregando extrato do banco de dados...
+    </p>
+
+    <!-- ERRO DE CONEXÃO -->
+    <p
+      *ngIf="erroCarregamento"
+      role="alert"
+      style="color: #b43b4d; font-size: 12px; margin: 0;"
+    >
+      {{ erroCarregamento }}
+    </p>
+
+    <!-- AVISO DE DIVERGÊNCIA DO SALDO -->
+    <p
+      *ngIf="saldoDivergente"
+      role="alert"
+      style="color: #9a6400; font-size: 12px; margin: 0;"
+    >
+      Atenção: o saldo retornado pela API é diferente
+      de entradas menos saídas. Precisamos conferir
+      as consultas de soma no backend.
+    </p>
+
+    <!-- ================================= -->
+    <!-- CARDS -->
+    <!-- ================================= -->
+
+    <section class="summary-grid">
+
+      <!-- SALDO -->
+      <div class="summary-card saldo-card">
+
+        <div class="card-top">
+          <span>Saldo acumulado</span>
+          <span class="card-icon">◈</span>
+        </div>
+
+        <strong
+          class="card-value"
+          [class.negative]="saldo !== null && saldo < 0"
+        >
+          {{
+            saldo === null
+              ? '—'
+              : formatarMoeda(saldo)
+          }}
+        </strong>
+
+        <small>
+          Entradas menos saídas (calculado pelo banco)
+        </small>
+
+      </div>
+
+      <!-- ENTRADAS -->
+      <div class="summary-card entradas-card">
+
+        <div class="card-top">
+          <span>Total de entradas</span>
+          <span class="card-icon">↗</span>
+        </div>
+
+        <strong class="card-value">
+          {{
+            carregando
+              ? '—'
+              : formatarMoeda(totalEntradas)
+          }}
+        </strong>
+
+        <small>
+          {{ entradas.length }} recebimentos
+        </small>
+
+      </div>
+
+      <!-- SAÍDAS -->
+      <div class="summary-card saidas-card">
+
+        <div class="card-top">
+          <span>Total de saídas</span>
+          <span class="card-icon">↘</span>
+        </div>
+
+        <strong class="card-value">
+          {{
+            carregando
+              ? '—'
+              : formatarMoeda(totalSaidas)
+          }}
+        </strong>
+
+        <small>
+          {{ saidas.length }} despesas
+        </small>
+
+      </div>
+
+    </section>
+
+    <!-- ================================= -->
+    <!-- FILTROS -->
+    <!-- ================================= -->
+
+    <section class="filters-section">
+
+      <div class="filters-heading">
+
+        <h2>Filtrar movimentações</h2>
+
+        <p>
+          Os filtros não alteram o saldo acumulado.
+        </p>
+
+      </div>
+
+      <div class="filters">
+
+        <!-- NOME -->
+        <div class="filter-field search-filter">
+
+          <label for="filtroNome">Nome</label>
+
+          <input
+            id="filtroNome"
+            name="filtroNome"
+            type="search"
+            placeholder="Buscar pelo nome"
+            [(ngModel)]="filtroNome"
+          />
+
+        </div>
+
+        <!-- TIPO -->
+        <div class="filter-field">
+
+          <label for="filtroTipo">Tipo</label>
+
+          <select
+            id="filtroTipo"
+            name="filtroTipo"
+            [(ngModel)]="filtroTipo"
+          >
+            <option value="todos">Todas</option>
+            <option value="entrada">Entradas</option>
+            <option value="saida">Saídas</option>
+          </select>
+
+        </div>
+
+        <!-- MÊS -->
+        <div class="filter-field">
+
+          <label for="filtroMes">Mês (opcional)</label>
+
+          <input
+            id="filtroMes"
+            name="filtroMes"
+            type="month"
+            [(ngModel)]="filtroMes"
+          />
+
+        </div>
+
+        <!-- LIMPAR FILTROS -->
+        <button
+          type="button"
+          class="clear-button"
+          (click)="limparFiltros()"
+        >
+          Limpar filtros
+        </button>
+
+      </div>
+
+    </section>
+
+    <!-- ================================= -->
+    <!-- HISTÓRICO DE MOVIMENTAÇÕES -->
+    <!-- ================================= -->
+
+    <section class="table-card">
+
+      <div class="table-header">
+
+        <div class="table-title">
+
+          <h2>Histórico de movimentações</h2>
+
+          <span class="count-badge">
+            {{ movimentacoesFiltradas.length }}
+          </span>
+
+        </div>
+
+        <span class="read-only-label">
+          Somente consulta
+        </span>
+
+      </div>
+
+      <!-- TABELA COM ROLAGEM -->
+      <div class="table-wrapper">
+
+        <table>
+
+          <thead>
+            <tr>
+              <th>Movimentação</th>
+              <th>Tipo</th>
+              <th>Valor</th>
+              <th>Data/hora</th>
+            </tr>
+          </thead>
+
+          <tbody>
+
+            <ng-container
+              *ngIf="!carregando; else carregandoTabela"
+            >
+
+              <!-- MOVIMENTAÇÕES -->
+              <ng-container
+                *ngIf="
+                  movimentacoesFiltradas.length > 0;
+                  else listaVazia
+                "
+              >
+
+                <tr
+                  *ngFor="
+                    let movimentacao of movimentacoesFiltradas;
+                    trackBy: identificarMovimentacao
+                  "
+                >
+
+                  <!-- NOME -->
+                  <td class="movement-name">
+                    {{ movimentacao.nome }}
+                  </td>
+
+                  <!-- TIPO -->
+                  <td>
+
+                    <span
+                      class="type-badge"
+                      [ngClass]="movimentacao.tipo"
+                    >
+                      {{
+                        movimentacao.tipo === 'entrada'
+                          ? 'Entrada'
+                          : 'Saída'
+                      }}
+                    </span>
+
+                  </td>
+
+                  <!-- VALOR -->
+                  <td
+                    class="movement-value"
+                    [ngClass]="movimentacao.tipo"
+                  >
+
+                    {{
+                      movimentacao.tipo === 'entrada'
+                        ? '+'
+                        : '−'
+                    }}
+
+                    {{ formatarMoeda(movimentacao.valor) }}
+
+                  </td>
+
+                  <!-- DATA E HORA -->
+                  <td class="movement-date">
+                    {{ formatarData(movimentacao.dataHora) }}
+                  </td>
+
+                </tr>
+
+              </ng-container>
+
+            </ng-container>
+
+            <!-- CARREGANDO TABELA -->
+            <ng-template #carregandoTabela>
+
+              <tr>
+                <td colspan="4" class="empty-state">
+
+                  <strong>
+                    Carregando movimentações...
+                  </strong>
+
+                </td>
+              </tr>
+
+            </ng-template>
+
+            <!-- NENHUM REGISTRO -->
+            <ng-template #listaVazia>
+
+              <tr>
+                <td colspan="4" class="empty-state">
+
+                  <strong>
+                    Nenhuma movimentação encontrada
+                  </strong>
+
+                  <p>
+                    Cadastre entradas e saídas ou
+                    altere os filtros da pesquisa.
+                  </p>
+
+                </td>
+              </tr>
+
+            </ng-template>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </section>
+
+    <!-- ================================= -->
+    <!-- RODAPÉ -->
+    <!-- ================================= -->
+
+    <footer class="list-footer">
+
+      <span>
+        Exibindo {{ movimentacoesFiltradas.length }}
+        de {{ movimentacoes.length }} movimentações
+      </span>
+
+      <span>
+        Role a tabela para visualizar mais registros
+      </span>
+
+    </footer>
+
+  </main>
+
+</div>

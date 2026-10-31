@@ -1,0 +1,84 @@
+<div class="details-page" [class.modal-mode]="emModal">
+  <!-- CABEÇALHO DE PÁGINA: ESCONDIDO DENTRO DO MODAL -->
+  <header class="topbar" *ngIf="!emModal">
+    <div class="breadcrumb">
+      <span>Financeiro</span><span class="separator">›</span>
+      <a routerLink="/otc/saidas">Saídas</a>
+      <span class="separator">›</span>
+      <strong>{{ modoEdicao ? 'Editar saída' : 'Nova saída' }}</strong>
+    </div>
+  </header>
+
+  <main class="page-content">
+    <a *ngIf="!emModal" routerLink="/otc/saidas" class="back-link">
+      <span aria-hidden="true">←</span> Voltar para saidas
+    </a>
+
+    <div class="page-heading">
+      <h1 id="titulo-saida-modal">
+        {{ modoEdicao ? 'Editar saída' : 'Nova saída' }}
+      </h1>
+      <p>
+        {{ modoEdicao
+          ? 'Atualize as informações da saída selecionada.'
+          : 'Registre uma nova despesa.'
+        }}
+      </p>
+    </div>
+
+    <!-- X DO MODAL -->
+    <button *ngIf="emModal" type="button" class="modal-close"
+            aria-label="Fechar formulário" (click)="cancelar()">×</button>
+
+    <section class="form-card">
+      <div class="card-heading">
+        <div class="heading-icon"><span>−</span></div>
+        <div>
+          <h2>Informações da saída</h2>
+          <p>Preencha os campos abaixo.</p>
+        </div>
+      </div>
+
+      <form class="saída-form" (ngSubmit)="salvar()">
+        <div class="form-group">
+          <label for="nomeSaida">Nome da saída <span class="required">*</span></label>
+          <input id="nomeSaida" name="nomeSaida" type="text" required
+                 placeholder="Ex.: Aluguel, supermercado, energia..."
+                 maxlength="255" autocomplete="off" [(ngModel)]="nomeSaida" />
+          <small>Informe uma descrição para identificar a despesa.</small>
+        </div>
+
+        <div class="form-group">
+          <label for="valor">Valor da saída <span class="required">*</span></label>
+          <div class="value-input">
+            <span class="currency-prefix">R$</span>
+            <input id="valor" name="valor" type="number" required min="0.01"
+                   step="0.01" placeholder="0,00" [(ngModel)]="valor" />
+          </div>
+          <small>Informe um valor maior que zero, com até duas casas decimais.</small>
+        </div>
+
+        <div class="info-box">
+          <span class="info-icon">i</span>
+          <p>A data e a hora são registradas automaticamente no cadastro e não
+             podem ser alteradas na edição.</p>
+        </div>
+
+        <div class="error-message" *ngIf="mensagemErro" role="alert">
+          {{ mensagemErro }}
+        </div>
+
+        <div class="form-actions">
+          <button *ngIf="emModal" type="button" class="cancel-button"
+                  (click)="cancelar()">Cancelar</button>
+          <a *ngIf="!emModal" routerLink="/otc/saidas" class="cancel-button">
+            Cancelar
+          </a>
+          <button type="submit" class="save-button" [disabled]="salvando">
+            {{ modoEdicao ? 'Salvar alterações' : 'Salvar saída' }}
+          </button>
+        </div>
+      </form>
+    </section>
+  </main>
+</div>

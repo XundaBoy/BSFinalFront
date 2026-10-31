@@ -40,3 +40,12 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+
+
+# Variáveis de ambiente e arquivos sensíveis
+.env
+.env.*
+!.env.example
+
+# Arquivos temporários do Angular
+/.angular/

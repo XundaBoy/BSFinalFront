@@ -1,0 +1,823 @@
+:host {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+// ======================================
+// PÁGINA
+// ======================================
+
+.entradas-page {
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+
+  display: flex;
+  flex-direction: column;
+
+  background: #f7f8fc;
+  color: #25243b;
+
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+// ======================================
+// CABEÇALHO
+// ======================================
+
+.topbar {
+  display: flex;
+  align-items: center;
+
+  min-height: 70px;
+  flex-shrink: 0;
+
+  padding: 0 32px;
+
+  background: #ffffff;
+  border-bottom: 1px solid #eeeef4;
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  font-size: 12px;
+
+  span {
+    color: #9391a9;
+  }
+
+  .separator {
+    font-size: 20px;
+    color: #b9b5ca;
+  }
+
+  strong {
+    color: #28263f;
+    font-weight: 600;
+  }
+}
+
+// ======================================
+// CONTEÚDO PRINCIPAL
+// ======================================
+
+.page-content {
+  width: 100%;
+  max-width: 1500px;
+
+  flex: 1;
+  min-height: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 22px;
+  padding: 26px 32px 20px;
+
+  margin: 0 auto;
+
+  overflow: hidden;
+}
+
+// ======================================
+// RESUMO E FILTROS
+// ======================================
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+
+  gap: 18px;
+
+  flex-shrink: 0;
+}
+
+.summary-badge {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+
+  padding: 11px 14px;
+
+  border-radius: 9px;
+  background: #eeeaff;
+
+  font-size: 12px;
+  color: #797491;
+
+  strong {
+    color: #6254d9;
+    font-size: 15px;
+    font-weight: 700;
+  }
+}
+
+.filters {
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+// ======================================
+// CAMPOS DOS FILTROS
+// ======================================
+
+.filter-field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+
+  label {
+    padding-left: 2px;
+
+    font-size: 11px;
+    font-weight: 500;
+    color: #89869f;
+  }
+
+  input {
+    width: 135px;
+    height: 39px;
+
+    padding: 0 11px;
+
+    background: #ffffff;
+    border: 1px solid #e7e6ef;
+    border-radius: 8px;
+
+    color: #333149;
+    font-family: inherit;
+    font-size: 12px;
+
+    outline: none;
+
+    transition:
+      border-color 0.2s,
+      box-shadow 0.2s;
+
+    &::placeholder {
+      color: #aaa8b9;
+    }
+
+    &:focus {
+      border-color: #7366e6;
+
+      box-shadow:
+        0 0 0 3px rgba(115, 102, 230, 0.1);
+    }
+  }
+}
+
+.filter-month {
+  input {
+    width: 165px;
+  }
+}
+
+// ======================================
+// LIMPAR FILTROS
+// ======================================
+
+.clear-button {
+  height: 39px;
+  padding: 0 15px;
+
+  background: #ffffff;
+  border: 1px solid #e7e6ef;
+  border-radius: 8px;
+
+  color: #88859d;
+  font-family: inherit;
+  font-size: 12px;
+
+  cursor: pointer;
+
+  transition:
+    color 0.2s,
+    background 0.2s,
+    border-color 0.2s;
+
+  &:hover {
+    color: #6254d9;
+    background: #faf9ff;
+    border-color: #c9c3f5;
+  }
+}
+
+// ======================================
+// TÍTULO DA PÁGINA
+// ======================================
+
+.page-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+  flex-shrink: 0;
+
+  h1 {
+    margin: 0 0 7px;
+
+    font-size: 27px;
+    font-weight: 500;
+    color: #242239;
+  }
+
+  p {
+    margin: 0;
+
+    color: #89869e;
+    font-size: 13px;
+  }
+}
+
+// ======================================
+// BOTÃO NOVA ENTRADA
+// ======================================
+
+.new-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+
+  min-height: 41px;
+  padding: 0 18px;
+
+  border-radius: 8px;
+  border: none;
+
+  background: #6355d9;
+  color: #ffffff;
+
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+
+  cursor: pointer;
+  white-space: nowrap;
+
+  transition:
+    background 0.2s,
+    transform 0.2s,
+    box-shadow 0.2s;
+
+  &:hover {
+    background: #5143c4;
+    color: #ffffff;
+
+    transform: translateY(-1px);
+
+    box-shadow:
+      0 7px 16px rgba(99, 85, 217, 0.18);
+  }
+}
+
+.plus-icon {
+  font-size: 21px;
+  line-height: 1;
+  font-weight: 400;
+}
+
+// ======================================
+// CARD DA TABELA
+// ======================================
+
+.table-card {
+  width: 100%;
+
+  flex: 1;
+  min-height: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  background: #ffffff;
+
+  border: 1px solid #eae9f1;
+  border-radius: 13px;
+
+  overflow: hidden;
+}
+
+// ======================================
+// CABEÇALHO DA LISTAGEM
+// ======================================
+
+.table-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+
+  flex-shrink: 0;
+
+  gap: 15px;
+  padding: 19px 22px;
+
+  border-bottom: 1px solid #eeeef4;
+}
+
+.table-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  h2 {
+    margin: 0;
+
+    font-size: 14px;
+    font-weight: 600;
+    color: #2b2940;
+  }
+}
+
+.count-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 22px;
+  height: 22px;
+
+  padding: 0 6px;
+
+  border-radius: 50px;
+
+  background: #f0ecff;
+  color: #6b5de2;
+
+  font-size: 11px;
+  font-weight: 700;
+}
+
+// ======================================
+// FILTRO POR NOME
+// ======================================
+
+.search-field {
+  position: relative;
+
+  width: 235px;
+  max-width: 100%;
+
+  svg {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+
+    width: 15px;
+    height: 15px;
+
+    transform: translateY(-50%);
+    color: #8d89a5;
+  }
+
+  input {
+    width: 100%;
+    height: 38px;
+
+    padding: 0 12px 0 36px;
+
+    background: #ffffff;
+    border: 1px solid #e9e8f0;
+    border-radius: 8px;
+
+    color: #302d47;
+    font-family: inherit;
+    font-size: 12px;
+
+    outline: none;
+
+    &::placeholder {
+      color: #aaa7b9;
+    }
+
+    &:focus {
+      border-color: #7366e6;
+
+      box-shadow:
+        0 0 0 3px rgba(115, 102, 230, 0.1);
+    }
+  }
+}
+
+// ======================================
+// ÁREA DE ROLAGEM DA TABELA
+// ======================================
+
+.table-wrapper {
+  width: 100%;
+
+  flex: 1;
+  min-height: 0;
+
+  overflow-y: auto;
+  overflow-x: auto;
+
+  scrollbar-width: thin;
+  scrollbar-color: #bcb5ef #f7f8fc;
+}
+
+// BARRA DE ROLAGEM
+
+.table-wrapper::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+.table-wrapper::-webkit-scrollbar-track {
+  background: #f7f8fc;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb {
+  background: #bcb5ef;
+  border-radius: 10px;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb:hover {
+  background: #8276dd;
+}
+
+// ======================================
+// TABELA
+// ======================================
+
+table {
+  width: 100%;
+  min-width: 700px;
+
+  border-collapse: collapse;
+  text-align: left;
+
+  font-size: 12px;
+}
+
+// CABEÇALHO FIXO DA TABELA
+
+thead {
+  background: #fafafd;
+
+  th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+
+    padding: 14px 20px;
+
+    background: #fafafd;
+
+    color: #89869f;
+    font-size: 11px;
+    font-weight: 500;
+
+    border-bottom: 1px solid #eeeef4;
+  }
+}
+
+// LINHAS
+
+tbody tr {
+  border-bottom: 1px solid #f0eff5;
+
+  transition: background 0.2s;
+
+  &:hover {
+    background: #fbfaff;
+  }
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+tbody td {
+  padding: 17px 20px;
+  vertical-align: middle;
+}
+
+.entry-name {
+  color: #29273d;
+  font-weight: 500;
+}
+
+.entry-value {
+  color: #302d44;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.entry-date {
+  color: #88859f;
+  white-space: nowrap;
+}
+
+// ======================================
+// BOTÕES EDITAR E EXCLUIR
+// ======================================
+
+.actions-heading {
+  text-align: center;
+}
+
+.row-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.action-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 30px;
+  padding: 0 11px;
+
+  border: 1px solid transparent;
+  border-radius: 7px;
+
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s,
+    border-color 0.2s;
+}
+
+.edit-button {
+  color: #6456d6;
+  background: #f0edff;
+
+  &:hover {
+    background: #e3ddff;
+    color: #5143c4;
+  }
+}
+
+.delete-button {
+  color: #cf5862;
+  background: #fff0f1;
+
+  &:hover {
+    color: #b73d48;
+    background: #ffe2e5;
+  }
+}
+
+// ======================================
+// NENHUMA ENTRADA
+// ======================================
+
+.empty-state {
+  padding: 55px 20px;
+  text-align: center;
+
+  .empty-icon {
+    font-size: 35px;
+    color: #8d82df;
+  }
+
+  strong {
+    display: block;
+    margin: 12px 0 7px;
+
+    font-size: 14px;
+    color: #37334e;
+  }
+
+  p {
+    margin: 0;
+
+    font-size: 12px;
+    color: #9692a9;
+  }
+}
+
+// ======================================
+// RODAPÉ DA LISTAGEM
+// ======================================
+
+.list-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  flex-shrink: 0;
+
+  color: #89869e;
+  font-size: 11px;
+}
+
+// ======================================
+// RESPONSIVIDADE
+// ======================================
+
+@media (max-width: 1050px) {
+  .toolbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 700px) {
+
+  .topbar {
+    min-height: 55px;
+    padding: 0 20px;
+  }
+
+  .page-content {
+    gap: 16px;
+    padding: 18px 16px;
+  }
+
+  .filters {
+    width: 100%;
+  }
+
+  .filter-field {
+    flex: 1 1 130px;
+
+    input {
+      width: 100%;
+    }
+  }
+
+  .page-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+
+    h1 {
+      font-size: 23px;
+    }
+  }
+
+  .table-header {
+    padding: 15px;
+  }
+
+  .search-field {
+    width: 100%;
+  }
+
+  .list-footer {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-height: 650px) {
+  .page-content {
+    gap: 12px;
+    padding-top: 14px;
+    padding-bottom: 12px;
+  }
+
+  .topbar {
+    min-height: 52px;
+  }
+
+  .table-header {
+    padding-top: 12px;
+    padding-bottom: 12px;
+  }
+}
+
+// =====================================
+// TRÊS PONTINHOS
+// =====================================
+.more-button {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 34px;
+  height: 34px;
+  padding: 7px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: #89869f;
+  cursor: pointer;
+
+  svg { width: 18px; height: 18px; }
+
+  &:hover, &[aria-expanded="true"] {
+    background: #f0edff;
+    border-color: #e2dcff;
+    color: #6355d9;
+  }
+  &:focus-visible { outline: 2px solid #6355d9; outline-offset: 2px; }
+}
+
+// =====================================
+// MENU FLUTUANTE (FORA DA ROLAGEM)
+// =====================================
+.action-dropdown {
+  position: fixed;
+  z-index: 1050;
+  display: flex;
+  flex-direction: column;
+  width: 180px;
+  padding: 7px;
+  border: 1px solid #e6def7;
+  border-radius: 11px;
+  background: #f8f5ff;
+  box-shadow: 0 10px 28px rgba(47,39,101,.14);
+  font-family: Arial, Helvetica, sans-serif;
+}
+.dropdown-option {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  width: 100%;
+  min-height: 42px;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  color: #37334e;
+  font: 500 13px Arial, Helvetica, sans-serif;
+  text-align: left;
+  cursor: pointer;
+
+  svg { width: 17px; height: 17px; color: #6355d9; }
+  &:hover, &:focus-visible { background: #eee8ff; outline: none; }
+}
+.delete-option {
+  color: #c94f60;
+  svg { color: #c94f60; }
+  &:hover, &:focus-visible { background: #ffe9ed; }
+}
+
+// =====================================
+// MODAL DE EDIÇÃO
+// =====================================
+.edit-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(24, 20, 53, .58);
+  backdrop-filter: blur(3px);
+}
+.edit-dialog {
+  width: 100%;
+  max-width: 610px;
+  max-height: calc(100dvh - 40px);
+  overflow-y: auto;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 25px 80px rgba(20,16,45,.24);
+  scrollbar-width: thin;
+  scrollbar-color: #c6c0ed #f7f8fc;
+}
+
+// Estado das chamadas à API (sem alterar a aparência da tabela).
+.api-status {
+  flex-shrink: 0;
+  padding: 12px 20px;
+  font-size: 12px;
+  background: #f7f5ff;
+  color: #6355d9;
+}
+.api-error {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: #fff1f2;
+  color: #b43b4d;
+  button {
+    border: 1px solid #d3cafd;
+    border-radius: 7px;
+    padding: 7px 10px;
+    background: #fff;
+    color: #6355d9;
+    cursor: pointer;
+  }
+}
