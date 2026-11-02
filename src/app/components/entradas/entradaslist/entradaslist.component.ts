@@ -1,5 +1,5 @@
 
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 
 import {
@@ -22,10 +22,9 @@ import {
 @Component({
     selector: 'app-entradaslist',
     imports: [
-        CommonModule,
-        FormsModule,
-        EntradasdetailsComponent
-    ],
+    FormsModule,
+    EntradasdetailsComponent
+],
     templateUrl: './entradaslist.component.html',
     styleUrl: './entradaslist.component.scss'
 })

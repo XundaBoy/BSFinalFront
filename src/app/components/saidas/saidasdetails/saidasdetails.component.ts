@@ -8,7 +8,7 @@ import {
   inject
 } from '@angular/core';
 
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import {
   ActivatedRoute,
@@ -29,7 +29,7 @@ export type { Saida } from '../../../services/saidas.service';
 
 @Component({
     selector: 'app-saidasdetails',
-    imports: [CommonModule, FormsModule, RouterLink],
+    imports: [FormsModule, RouterLink],
     templateUrl: './saidasdetails.component.html',
     styleUrl: './saidasdetails.component.scss'
 })

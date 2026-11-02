@@ -34,7 +34,9 @@
           {{ carregandoSaldo ? 'Carregando...' : saldoCaixa === null ? 'Indisponível' : formatarUSD(saldoCaixa) }}
         </strong>
         <p>Saldo atual calculado pelas entradas e saídas.</p>
-        <small class="error" *ngIf="erroSaldo" role="alert">{{ erroSaldo }}</small>
+        @if (erroSaldo) {
+          <small class="error" role="alert">{{ erroSaldo }}</small>
+        }
       </div>
     </article>
 
@@ -89,28 +91,38 @@
         <a routerLink="/otc/pagar" class="view-all">Ver agenda</a>
       </div>
 
-      <div *ngIf="carregandoPagar" class="load-message" role="status">Carregando contas a pagar...</div>
-      <div *ngIf="erroPagar" class="load-message error" role="alert">
-        {{ erroPagar }}
-        <button type="button" (click)="carregarAgenda('PAGAR')">Tentar novamente</button>
-      </div>
+      @if (carregandoPagar) {
+        <div class="load-message" role="status">Carregando contas a pagar...</div>
+      }
+      @if (erroPagar) {
+        <div class="load-message error" role="alert">
+          {{ erroPagar }}
+          <button type="button" (click)="carregarAgenda('PAGAR')">Tentar novamente</button>
+        </div>
+      }
 
-      <div class="table-scroll" *ngIf="!carregandoPagar && !erroPagar">
-        <table>
-          <thead><tr><th>Vencimento</th><th>Descrição</th><th>Valor</th><th>Alerta</th></tr></thead>
-          <tbody>
-            <tr *ngFor="let conta of proximasPagar; trackBy: identificarConta">
-              <td class="date-cell">{{ formatarData(conta.dataHora) }}</td>
-              <td class="name-cell">{{ conta.nome }}</td>
-              <td class="money-cell">{{ formatarMoeda(conta.valor, conta.moeda) }}</td>
-              <td><span class="alert-pill" [ngClass]="alerta(conta) === 'Hoje' ? 'today' : alerta(conta) === 'Amanhã' ? 'tomorrow' : 'upcoming'">{{ alerta(conta) }}</span></td>
-            </tr>
-            <tr *ngIf="proximasPagar.length === 0">
-              <td colspan="4" class="empty-state">Nenhuma conta pendente para os próximos 7 dias.</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      @if (!carregandoPagar && !erroPagar) {
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th>Vencimento</th><th>Descrição</th><th>Valor</th><th>Alerta</th></tr></thead>
+            <tbody>
+              @for (conta of proximasPagar; track identificarConta($index, conta)) {
+                <tr>
+                  <td class="date-cell">{{ formatarData(conta.dataHora) }}</td>
+                  <td class="name-cell">{{ conta.nome }}</td>
+                  <td class="money-cell">{{ formatarMoeda(conta.valor, conta.moeda) }}</td>
+                  <td><span class="alert-pill" [ngClass]="alerta(conta) === 'Hoje' ? 'today' : alerta(conta) === 'Amanhã' ? 'tomorrow' : 'upcoming'">{{ alerta(conta) }}</span></td>
+                </tr>
+              }
+              @if (proximasPagar.length === 0) {
+                <tr>
+                  <td colspan="4" class="empty-state">Nenhuma conta pendente para os próximos 7 dias.</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
       <footer class="agenda-footer">{{ proximasPagar.length }} conta(s) pendente(s) no período</footer>
     </article>
 
@@ -128,28 +140,38 @@
         <a routerLink="/otc/receber" class="view-all">Ver agenda</a>
       </div>
 
-      <div *ngIf="carregandoReceber" class="load-message" role="status">Carregando contas a receber...</div>
-      <div *ngIf="erroReceber" class="load-message error" role="alert">
-        {{ erroReceber }}
-        <button type="button" (click)="carregarAgenda('RECEBER')">Tentar novamente</button>
-      </div>
+      @if (carregandoReceber) {
+        <div class="load-message" role="status">Carregando contas a receber...</div>
+      }
+      @if (erroReceber) {
+        <div class="load-message error" role="alert">
+          {{ erroReceber }}
+          <button type="button" (click)="carregarAgenda('RECEBER')">Tentar novamente</button>
+        </div>
+      }
 
-      <div class="table-scroll" *ngIf="!carregandoReceber && !erroReceber">
-        <table>
-          <thead><tr><th>Vencimento</th><th>Descrição</th><th>Valor</th><th>Alerta</th></tr></thead>
-          <tbody>
-            <tr *ngFor="let conta of proximasReceber; trackBy: identificarConta">
-              <td class="date-cell">{{ formatarData(conta.dataHora) }}</td>
-              <td class="name-cell">{{ conta.nome }}</td>
-              <td class="money-cell">{{ formatarMoeda(conta.valor, conta.moeda) }}</td>
-              <td><span class="alert-pill" [ngClass]="alerta(conta) === 'Hoje' ? 'today' : alerta(conta) === 'Amanhã' ? 'tomorrow' : 'upcoming'">{{ alerta(conta) }}</span></td>
-            </tr>
-            <tr *ngIf="proximasReceber.length === 0">
-              <td colspan="4" class="empty-state">Nenhum recebimento pendente para os próximos 7 dias.</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      @if (!carregandoReceber && !erroReceber) {
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th>Vencimento</th><th>Descrição</th><th>Valor</th><th>Alerta</th></tr></thead>
+            <tbody>
+              @for (conta of proximasReceber; track identificarConta($index, conta)) {
+                <tr>
+                  <td class="date-cell">{{ formatarData(conta.dataHora) }}</td>
+                  <td class="name-cell">{{ conta.nome }}</td>
+                  <td class="money-cell">{{ formatarMoeda(conta.valor, conta.moeda) }}</td>
+                  <td><span class="alert-pill" [ngClass]="alerta(conta) === 'Hoje' ? 'today' : alerta(conta) === 'Amanhã' ? 'tomorrow' : 'upcoming'">{{ alerta(conta) }}</span></td>
+                </tr>
+              }
+              @if (proximasReceber.length === 0) {
+                <tr>
+                  <td colspan="4" class="empty-state">Nenhum recebimento pendente para os próximos 7 dias.</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
       <footer class="agenda-footer">{{ proximasReceber.length }} conta(s) pendente(s) no período</footer>
     </article>
 

@@ -36,40 +36,43 @@
     <!-- CARREGAMENTO -->
     <!-- ================================= -->
 
-    <p
-      *ngIf="carregando"
-      role="status"
-      style="color: #6355d9; font-size: 12px; margin: 0;"
-    >
-      Carregando extrato do banco de dados...
-    </p>
+    @if (carregando) {
+      <p
+        role="status"
+        style="color: #6355d9; font-size: 12px; margin: 0;"
+        >
+        Carregando extrato do banco de dados...
+      </p>
+    }
 
     <!-- ================================= -->
     <!-- ERRO DE CONEXAO -->
     <!-- ================================= -->
 
-    <p
-      *ngIf="erroCarregamento"
-      role="alert"
-      style="color: #b43b4d; font-size: 12px; margin: 0;"
-    >
-      {{ erroCarregamento }}
-    </p>
+    @if (erroCarregamento) {
+      <p
+        role="alert"
+        style="color: #b43b4d; font-size: 12px; margin: 0;"
+        >
+        {{ erroCarregamento }}
+      </p>
+    }
 
     <!-- ================================= -->
     <!-- AVISO DE DIVERGENCIA DO SALDO -->
     <!-- ================================= -->
 
-    <p
-      *ngIf="saldoDivergente"
-      role="alert"
-      style="color: #9a6400; font-size: 12px; margin: 0;"
-    >
-      Atenção: o saldo em USD retornado pela API
-      é diferente do total de entradas menos saídas.
-      Precisamos conferir as consultas de soma
-      no backend.
-    </p>
+    @if (saldoDivergente) {
+      <p
+        role="alert"
+        style="color: #9a6400; font-size: 12px; margin: 0;"
+        >
+        Atenção: o saldo em USD retornado pela API
+        é diferente do total de entradas menos saídas.
+        Precisamos conferir as consultas de soma
+        no backend.
+      </p>
+    }
 
     <!-- ================================= -->
     <!-- CARDS DE RESUMO -->
@@ -94,11 +97,11 @@
         <strong
           class="card-value"
           [class.negative]="saldo !== null && saldo < 0"
-        >
+          >
           {{
-            saldo === null
-              ? '—'
-              : formatarMoeda(saldo)
+          saldo === null
+          ? '—'
+          : formatarMoeda(saldo)
           }}
         </strong>
 
@@ -125,17 +128,17 @@
 
         <strong class="card-value">
           {{
-            carregando || !entradasDisponiveis
-              ? '—'
-              : formatarMoeda(totalEntradas)
+          carregando || !entradasDisponiveis
+          ? '—'
+          : formatarMoeda(totalEntradas)
           }}
         </strong>
 
         <small>
           {{
-            entradasDisponiveis
-              ? entradas.length + ' recebimentos'
-              : 'Dados indisponíveis'
+          entradasDisponiveis
+          ? entradas.length + ' recebimentos'
+          : 'Dados indisponíveis'
           }}
         </small>
 
@@ -157,17 +160,17 @@
 
         <strong class="card-value">
           {{
-            carregando || !saidasDisponiveis
-              ? '—'
-              : formatarMoeda(totalSaidas)
+          carregando || !saidasDisponiveis
+          ? '—'
+          : formatarMoeda(totalSaidas)
           }}
         </strong>
 
         <small>
           {{
-            saidasDisponiveis
-              ? saidas.length + ' despesas'
-              : 'Dados indisponíveis'
+          saidasDisponiveis
+          ? saidas.length + ' despesas'
+          : 'Dados indisponíveis'
           }}
         </small>
 
@@ -207,7 +210,7 @@
             type="search"
             placeholder="Buscar pelo nome"
             [(ngModel)]="filtroNome"
-          />
+            />
 
         </div>
 
@@ -222,7 +225,7 @@
             id="filtroTipo"
             name="filtroTipo"
             [(ngModel)]="filtroTipo"
-          >
+            >
             <option value="todos">
               Todas
             </option>
@@ -250,7 +253,7 @@
             name="filtroMes"
             type="month"
             [(ngModel)]="filtroMes"
-          />
+            />
 
         </div>
 
@@ -259,7 +262,7 @@
           type="button"
           class="clear-button"
           (click)="limparFiltros()"
-        >
+          >
           Limpar filtros
         </button>
 
@@ -269,10 +272,10 @@
           class="export-button"
           [disabled]="carregando || !entradasDisponiveis || !saidasDisponiveis"
           (click)="abrirExportacao()"
-        >
+          >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-               stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
-               aria-hidden="true">
+            stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
+            aria-hidden="true">
             <path d="M12 3v12M7 10l5 5 5-5"/>
             <path d="M4 17v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/>
           </svg>
@@ -288,92 +291,83 @@
     <!-- O SALDO ACUMULADO ORIGINAL CONTINUA ACIMA -->
     <!-- ================================= -->
 
-    <section class="period-section" *ngIf="filtroMes">
-
-      <div class="period-heading">
-        <div>
-          <span class="period-eyebrow">PERÍODO SELECIONADO</span>
-          <h2>{{ mesSelecionadoPorExtenso }}</h2>
-          <p>De {{ intervaloMesSelecionado }} · Valores em USD</p>
-        </div>
-
-        <span class="period-tag">Resumo mensal</span>
-      </div>
-
-      <ng-container *ngIf="resumoMensal as resumo; else resumoIndisponivel">
-
-        <div class="period-grid">
-          <article class="period-card anterior">
-            <div class="period-card-title">
-              <span>Saldo anterior</span>
-              <span class="period-icon">◈</span>
-            </div>
-            <strong [class.valor-negativo]="resumo.saldoAnterior < 0">
-              {{ formatarMoeda(resumo.saldoAnterior) }}
-            </strong>
-            <small>Saldo até o último dia do mês anterior</small>
-          </article>
-
-          <article class="period-card period-entradas">
-            <div class="period-card-title">
-              <span>Entradas no mês</span>
-              <span class="period-icon">↗</span>
-            </div>
-            <strong>+ {{ formatarMoeda(resumo.entradasPeriodo) }}</strong>
-            <small>Somente movimentações deste mês</small>
-          </article>
-
-          <article class="period-card period-saidas">
-            <div class="period-card-title">
-              <span>Saídas no mês</span>
-              <span class="period-icon">↘</span>
-            </div>
-            <strong>− {{ formatarMoeda(resumo.saidasPeriodo) }}</strong>
-            <small>Somente movimentações deste mês</small>
-          </article>
-
-          <article class="period-card final">
-            <div class="period-card-title">
-              <span>Saldo ao fim do mês</span>
-              <span class="period-icon">✓</span>
-            </div>
-            <strong [class.valor-negativo]="resumo.saldoFinal < 0">
-              {{ formatarMoeda(resumo.saldoFinal) }}
-            </strong>
-            <small>Saldo anterior + entradas − saídas</small>
-          </article>
-        </div>
-
-        <div class="period-details">
+    @if (filtroMes) {
+      <section class="period-section">
+        <div class="period-heading">
           <div>
-            <span>Movimentações no mês</span>
-            <strong>{{ resumo.quantidade }} registros</strong>
+            <span class="period-eyebrow">PERÍODO SELECIONADO</span>
+            <h2>{{ mesSelecionadoPorExtenso }}</h2>
+            <p>De {{ intervaloMesSelecionado }} · Valores em USD</p>
           </div>
-          <div>
-            <span>Maior entrada</span>
-            <strong>{{ formatarMoeda(resumo.maiorEntrada) }}</strong>
-          </div>
-          <div>
-            <span>Maior saída</span>
-            <strong>{{ formatarMoeda(resumo.maiorSaida) }}</strong>
-          </div>
+          <span class="period-tag">Resumo mensal</span>
         </div>
-
-        <p class="period-note">
-          Os valores do resumo consideram todas as entradas e saídas do mês.
-          Os filtros de nome e tipo afetam somente a tabela abaixo.
-        </p>
-
-      </ng-container>
-
-      <ng-template #resumoIndisponivel>
-        <p class="period-unavailable" *ngIf="!carregando">
-          Não foi possível calcular o resumo mensal.
-          Confira se as entradas e saídas foram carregadas e se todos os registros possuem data.
-        </p>
-      </ng-template>
-
-    </section>
+        @if (resumoMensal; as resumo) {
+          <div class="period-grid">
+            <article class="period-card anterior">
+              <div class="period-card-title">
+                <span>Saldo anterior</span>
+                <span class="period-icon">◈</span>
+              </div>
+              <strong [class.valor-negativo]="resumo.saldoAnterior < 0">
+                {{ formatarMoeda(resumo.saldoAnterior) }}
+              </strong>
+              <small>Saldo até o último dia do mês anterior</small>
+            </article>
+            <article class="period-card period-entradas">
+              <div class="period-card-title">
+                <span>Entradas no mês</span>
+                <span class="period-icon">↗</span>
+              </div>
+              <strong>+ {{ formatarMoeda(resumo.entradasPeriodo) }}</strong>
+              <small>Somente movimentações deste mês</small>
+            </article>
+            <article class="period-card period-saidas">
+              <div class="period-card-title">
+                <span>Saídas no mês</span>
+                <span class="period-icon">↘</span>
+              </div>
+              <strong>− {{ formatarMoeda(resumo.saidasPeriodo) }}</strong>
+              <small>Somente movimentações deste mês</small>
+            </article>
+            <article class="period-card final">
+              <div class="period-card-title">
+                <span>Saldo ao fim do mês</span>
+                <span class="period-icon">✓</span>
+              </div>
+              <strong [class.valor-negativo]="resumo.saldoFinal < 0">
+                {{ formatarMoeda(resumo.saldoFinal) }}
+              </strong>
+              <small>Saldo anterior + entradas − saídas</small>
+            </article>
+          </div>
+          <div class="period-details">
+            <div>
+              <span>Movimentações no mês</span>
+              <strong>{{ resumo.quantidade }} registros</strong>
+            </div>
+            <div>
+              <span>Maior entrada</span>
+              <strong>{{ formatarMoeda(resumo.maiorEntrada) }}</strong>
+            </div>
+            <div>
+              <span>Maior saída</span>
+              <strong>{{ formatarMoeda(resumo.maiorSaida) }}</strong>
+            </div>
+          </div>
+          <p class="period-note">
+            Os valores do resumo consideram todas as entradas e saídas do mês.
+            Os filtros de nome e tipo afetam somente a tabela abaixo.
+          </p>
+        } @else {
+          @if (!carregando) {
+            <p class="period-unavailable">
+              Não foi possível calcular o resumo mensal.
+              Confira se as entradas e saídas foram carregadas e se todos os registros possuem data.
+            </p>
+          }
+        }
+      </section>
+    }
 
     <!-- ================================= -->
     <!-- HISTORICO DE MOVIMENTACOES -->
@@ -420,121 +414,82 @@
 
           <tbody>
 
-            <ng-container
-              *ngIf="!carregando; else carregandoTabela"
-            >
-
+            @if (!carregando) {
               <!-- MOVIMENTACOES -->
-              <ng-container
-                *ngIf="
-                  movimentacoesFiltradas.length > 0;
-                  else listaVazia
-                "
-              >
-
-                <tr
-                  *ngFor="
-                    let movimentacao of movimentacoesFiltradas;
-                    trackBy: identificarMovimentacao
-                  "
-                >
-
-                  <!-- NOME -->
-                  <td class="movement-name">
-
-                    {{ movimentacao.nome }}
-
-                  </td>
-
-                  <!-- TIPO -->
-                  <td>
-
-                    <span
-                      class="type-badge"
-                      [ngClass]="movimentacao.tipo"
+              @if (
+                movimentacoesFiltradas.length > 0) {
+                @for (
+                  movimentacao of movimentacoesFiltradas; track identificarMovimentacao($index,
+                  movimentacao)) {
+                  <tr
                     >
-                      {{
+                    <!-- NOME -->
+                    <td class="movement-name">
+                      {{ movimentacao.nome }}
+                    </td>
+                    <!-- TIPO -->
+                    <td>
+                      <span
+                        class="type-badge"
+                        [ngClass]="movimentacao.tipo"
+                        >
+                        {{
                         movimentacao.tipo === 'entrada'
-                          ? 'Entrada'
-                          : 'Saída'
-                      }}
-                    </span>
-
-                  </td>
-
-                  <!-- VALOR EM USD -->
-                  <td
-                    class="movement-value"
-                    [ngClass]="movimentacao.tipo"
-                  >
-
-                    {{
+                        ? 'Entrada'
+                        : 'Saída'
+                        }}
+                      </span>
+                    </td>
+                    <!-- VALOR EM USD -->
+                    <td
+                      class="movement-value"
+                      [ngClass]="movimentacao.tipo"
+                      >
+                      {{
                       movimentacao.tipo === 'entrada'
-                        ? '+'
-                        : '−'
-                    }}
-
-                    {{ formatarMoeda(movimentacao.valor) }}
-
+                      ? '+'
+                      : '−'
+                      }}
+                      {{ formatarMoeda(movimentacao.valor) }}
+                    </td>
+                    <!-- DATA E HORA -->
+                    <td class="movement-date">
+                      {{ formatarData(movimentacao.dataHora) }}
+                    </td>
+                  </tr>
+                }
+              } @else {
+                <tr>
+                  <td colspan="4" class="empty-state">
+                    <strong>
+                      Nenhuma movimentação encontrada
+                    </strong>
+                    <p>
+                      Cadastre entradas e saídas
+                      ou altere os filtros da pesquisa.
+                    </p>
                   </td>
-
-                  <!-- DATA E HORA -->
-                  <td class="movement-date">
-
-                    {{ formatarData(movimentacao.dataHora) }}
-
-                  </td>
-
                 </tr>
-
-              </ng-container>
-
-            </ng-container>
+              }
+            } @else {
+              <tr>
+                <td colspan="4" class="empty-state">
+                  <strong>
+                    Carregando movimentações...
+                  </strong>
+                </td>
+              </tr>
+            }
 
             <!-- ================================= -->
             <!-- CARREGANDO TABELA -->
             <!-- ================================= -->
 
-            <ng-template #carregandoTabela>
-
-              <tr>
-
-                <td colspan="4" class="empty-state">
-
-                  <strong>
-                    Carregando movimentações...
-                  </strong>
-
-                </td>
-
-              </tr>
-
-            </ng-template>
 
             <!-- ================================= -->
             <!-- NENHUM REGISTRO -->
             <!-- ================================= -->
 
-            <ng-template #listaVazia>
-
-              <tr>
-
-                <td colspan="4" class="empty-state">
-
-                  <strong>
-                    Nenhuma movimentação encontrada
-                  </strong>
-
-                  <p>
-                    Cadastre entradas e saídas
-                    ou altere os filtros da pesquisa.
-                  </p>
-
-                </td>
-
-              </tr>
-
-            </ng-template>
 
           </tbody>
 
@@ -571,68 +526,68 @@
 <!-- ===================================== -->
 <!-- MODAL DE EXPORTACAO EM PDF           -->
 <!-- ===================================== -->
-<div
-  *ngIf="modalExportacaoAberto"
-  class="export-overlay"
-  (click)="fecharExportacao()"
->
+@if (modalExportacaoAberto) {
   <div
-    class="export-dialog"
-    role="dialog"
-    aria-modal="true"
-    aria-labelledby="export-title"
-    (click)="$event.stopPropagation()"
-  >
-    <div class="export-dialog-heading">
-      <div class="export-dialog-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-             stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"
-             aria-hidden="true">
-          <path d="M8 3h8l4 4v14H4V3h4"/>
-          <path d="M16 3v5h4M8 12h8M8 16h8"/>
-        </svg>
+    class="export-overlay"
+    (click)="fecharExportacao()"
+    >
+    <div
+      class="export-dialog"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="export-title"
+      (click)="$event.stopPropagation()"
+      >
+      <div class="export-dialog-heading">
+        <div class="export-dialog-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"
+            aria-hidden="true">
+            <path d="M8 3h8l4 4v14H4V3h4"/>
+            <path d="M16 3v5h4M8 12h8M8 16h8"/>
+          </svg>
+        </div>
+        <div>
+          <h2 id="export-title">Exportar extrato</h2>
+          <p>Escolha o mês para gerar o relatório em PDF.</p>
+        </div>
+        <button
+          type="button"
+          class="export-close"
+          aria-label="Fechar janela de exportação"
+          [disabled]="exportando"
+          (click)="fecharExportacao()"
+        >×</button>
       </div>
-      <div>
-        <h2 id="export-title">Exportar extrato</h2>
-        <p>Escolha o mês para gerar o relatório em PDF.</p>
-      </div>
-      <button
-        type="button"
-        class="export-close"
-        aria-label="Fechar janela de exportação"
-        [disabled]="exportando"
-        (click)="fecharExportacao()"
-      >×</button>
+      <form (ngSubmit)="gerarExportacao()">
+        <label class="export-label" for="mesExportacao">Mês do extrato</label>
+        <input
+          id="mesExportacao"
+          class="export-month"
+          type="month"
+          name="mesExportacao"
+          [(ngModel)]="mesExportacao"
+          [disabled]="exportando"
+          required
+          />
+        <p class="export-info">
+          O arquivo incluirá saldo anterior, entradas, saídas, saldo final
+          e todas as movimentações do mês escolhido, em USD.
+        </p>
+        @if (erroExportacao) {
+          <p class="export-error" role="alert">
+            {{ erroExportacao }}
+          </p>
+        }
+        <div class="export-actions">
+          <button type="button" class="export-cancel" (click)="fecharExportacao()"
+          [disabled]="exportando">Cancelar</button>
+          <button type="submit" class="export-submit"
+            [disabled]="exportando || !mesExportacao">
+            {{ exportando ? 'Gerando PDF...' : 'Baixar PDF' }}
+          </button>
+        </div>
+      </form>
     </div>
-
-    <form (ngSubmit)="gerarExportacao()">
-      <label class="export-label" for="mesExportacao">Mês do extrato</label>
-      <input
-        id="mesExportacao"
-        class="export-month"
-        type="month"
-        name="mesExportacao"
-        [(ngModel)]="mesExportacao"
-        [disabled]="exportando"
-        required
-      />
-
-      <p class="export-info">
-        O arquivo incluirá saldo anterior, entradas, saídas, saldo final
-        e todas as movimentações do mês escolhido, em USD.
-      </p>
-      <p class="export-error" role="alert" *ngIf="erroExportacao">
-        {{ erroExportacao }}
-      </p>
-
-      <div class="export-actions">
-        <button type="button" class="export-cancel" (click)="fecharExportacao()"
-                [disabled]="exportando">Cancelar</button>
-        <button type="submit" class="export-submit"
-                [disabled]="exportando || !mesExportacao">
-          {{ exportando ? 'Gerando PDF...' : 'Baixar PDF' }}
-        </button>
-      </div>
-    </form>
   </div>
-</div>
+}

@@ -6,7 +6,7 @@ import {
   inject
 } from '@angular/core';
 
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
 
@@ -22,10 +22,9 @@ import {
 @Component({
     selector: 'app-saidaslist',
     imports: [
-        CommonModule,
-        FormsModule,
-        SaidasdetailsComponent
-    ],
+    FormsModule,
+    SaidasdetailsComponent
+],
     templateUrl: './saidaslist.component.html',
     styleUrl: './saidaslist.component.scss'
 })

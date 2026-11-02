@@ -8,7 +8,7 @@ import {
   inject
 } from '@angular/core';
 
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -26,7 +26,7 @@ type ModoCotacao = 'AUTOMATICA' | 'MANUAL';
 
 @Component({
     selector: 'app-entradasdetails',
-    imports: [CommonModule, FormsModule, RouterLink],
+    imports: [FormsModule, RouterLink],
     templateUrl: './entradasdetails.component.html',
     styleUrl: './entradasdetails.component.scss'
 })
