@@ -26,7 +26,10 @@ interface Movimentacao {
   id: number;
   tipo: TipoMovimentacao;
   nome: string;
+
+  // VALOR SEMPRE EM USD
   valor: number;
+
   dataHora: string | null;
 }
 
@@ -43,9 +46,9 @@ export class ExtratolistComponent implements OnInit {
   // SERVICES DO BACKEND
   // =====================================
 
-  private entradasService = inject(EntradasService);
-  private saidasService = inject(SaidasService);
-  private saldoService = inject(SaldoService);
+  private readonly entradasService = inject(EntradasService);
+  private readonly saidasService = inject(SaidasService);
+  private readonly saldoService = inject(SaldoService);
 
   // =====================================
   // DADOS RECEBIDOS DO MYSQL
@@ -55,27 +58,43 @@ export class ExtratolistComponent implements OnInit {
   saidas: Saida[] = [];
   movimentacoes: Movimentacao[] = [];
 
-  // Saldo calculado pelo Spring Boot
+  // SALDO EM USD CALCULADO PELO SPRING BOOT
   saldo: number | null = null;
 
   // =====================================
   // CONTROLE DE CARREGAMENTO
   // =====================================
 
-  carregando: boolean = false;
-  erroCarregamento: string = '';
-  dadosCompletos: boolean = false;
+  carregando = false;
+  erroCarregamento = '';
+  dadosCompletos = false;
+
+  entradasDisponiveis = false;
+  saidasDisponiveis = false;
 
   // =====================================
   // FILTROS
   // =====================================
 
-  filtroNome: string = '';
-  filtroMes: string = '';
+  filtroNome = '';
+  filtroMes = '';
+
   filtroTipo: 'todos' | TipoMovimentacao = 'todos';
 
   // =====================================
-  // INICIALIZAÇÃO
+  // FORMATADOR EXCLUSIVO EM USD
+  // =====================================
+
+  private readonly formatadorUSD =
+    new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+
+  // =====================================
+  // INICIALIZACAO
   // =====================================
 
   ngOnInit(): void {
@@ -83,7 +102,7 @@ export class ExtratolistComponent implements OnInit {
   }
 
   // =====================================
-  // BUSCAR DADOS DAS TRÊS APIS
+  // CARREGAR DADOS DAS TRES APIS
   // =====================================
 
   carregarExtrato(): void {
@@ -91,6 +110,13 @@ export class ExtratolistComponent implements OnInit {
     this.carregando = true;
     this.erroCarregamento = '';
     this.dadosCompletos = false;
+
+    this.entradasDisponiveis = false;
+    this.saidasDisponiveis = false;
+
+    this.entradas = [];
+    this.saidas = [];
+    this.movimentacoes = [];
     this.saldo = null;
 
     const avisos: string[] = [];
@@ -100,7 +126,11 @@ export class ExtratolistComponent implements OnInit {
       // BUSCAR ENTRADAS
       entradas: this.entradasService.findAll().pipe(
         catchError((erro: unknown) => {
-          console.error('Erro ao buscar entradas:', erro);
+
+          console.error(
+            'Erro ao buscar entradas:',
+            erro
+          );
 
           avisos.push(
             'Não foi possível consultar as entradas.'
@@ -110,10 +140,14 @@ export class ExtratolistComponent implements OnInit {
         })
       ),
 
-      // BUSCAR SAÍDAS
+      // BUSCAR SAIDAS
       saidas: this.saidasService.findAll().pipe(
         catchError((erro: unknown) => {
-          console.error('Erro ao buscar saídas:', erro);
+
+          console.error(
+            'Erro ao buscar saídas:',
+            erro
+          );
 
           avisos.push(
             'Não foi possível consultar as saídas.'
@@ -123,10 +157,14 @@ export class ExtratolistComponent implements OnInit {
         })
       ),
 
-      // BUSCAR SALDO
+      // BUSCAR SALDO EM USD
       saldo: this.saldoService.consultarSaldo().pipe(
         catchError((erro: unknown) => {
-          console.error('Erro ao consultar saldo:', erro);
+
+          console.error(
+            'Erro ao consultar saldo:',
+            erro
+          );
 
           avisos.push(
             'Não foi possível consultar o saldo.'
@@ -140,46 +178,113 @@ export class ExtratolistComponent implements OnInit {
 
       next: ({ entradas, saidas, saldo }) => {
 
-        // GUARDA ENTRADAS E SAÍDAS
-        this.entradas = entradas ?? [];
-        this.saidas = saidas ?? [];
+        // =====================================
+        // VALIDAR OS VALORES CONVERTIDOS
+        // =====================================
 
-        // TRANSFORMA ENTRADAS EM MOVIMENTAÇÕES
+        const entradasValidas =
+          entradas !== null &&
+          entradas.every(entrada =>
+            entrada.valorUsd !== null &&
+            entrada.valorUsd !== undefined &&
+            Number.isFinite(Number(entrada.valorUsd))
+          );
+
+        const saidasValidas =
+          saidas !== null &&
+          saidas.every(saida =>
+            saida.valorUsd !== null &&
+            saida.valorUsd !== undefined &&
+            Number.isFinite(Number(saida.valorUsd))
+          );
+
+        if (entradas !== null && !entradasValidas) {
+          avisos.push(
+            'Existem entradas sem um valor USD válido.'
+          );
+        }
+
+        if (saidas !== null && !saidasValidas) {
+          avisos.push(
+            'Existem saídas sem um valor USD válido.'
+          );
+        }
+
+        this.entradasDisponiveis = entradasValidas;
+        this.saidasDisponiveis = saidasValidas;
+
+        this.entradas = entradasValidas
+          ? entradas!
+          : [];
+
+        this.saidas = saidasValidas
+          ? saidas!
+          : [];
+
+        // =====================================
+        // ENTRADAS CONVERTIDAS PARA O EXTRATO
+        // =====================================
+
         const listaEntradas: Movimentacao[] =
           this.entradas.map(entrada => ({
 
             id: entrada.id,
+
             tipo: 'entrada',
+
             nome: entrada.nomeEntrada,
-            valor: Number(entrada.valor),
+
+            // USA O VALOR EM DOLAR
+            valor: Number(entrada.valorUsd),
+
             dataHora: entrada.dataHora ?? null
 
           }));
 
-        // TRANSFORMA SAÍDAS EM MOVIMENTAÇÕES
+        // =====================================
+        // SAIDAS CONVERTIDAS PARA O EXTRATO
+        // =====================================
+
         const listaSaidas: Movimentacao[] =
           this.saidas.map(saida => ({
 
             id: saida.id,
+
             tipo: 'saida',
+
             nome: saida.nomeSaida,
-            valor: Number(saida.valor),
+
+            // USA O VALOR EM DOLAR
+            valor: Number(saida.valorUsd),
+
             dataHora: saida.dataHora ?? null
 
           }));
 
-        // JUNTA ENTRADAS E SAÍDAS
+        // =====================================
+        // JUNTAR MOVIMENTACOES
+        // =====================================
+
         this.movimentacoes = [
           ...listaEntradas,
           ...listaSaidas
         ];
 
-        // ORDENA DA MAIS RECENTE PARA A MAIS ANTIGA
+        // =====================================
+        // ORDENAR DAS MAIS RECENTES
+        // PARA AS MAIS ANTIGAS
+        // =====================================
+
         this.movimentacoes.sort((a, b) =>
-          (b.dataHora ?? '').localeCompare(a.dataHora ?? '')
+          (b.dataHora ?? '').localeCompare(
+            a.dataHora ?? ''
+          )
         );
 
-        // SALDO RECEBIDO DO BACKEND
+        // =====================================
+        // RECEBER SALDO EM USD DO BACKEND
+        // =====================================
+
         this.saldo =
           saldo !== null &&
           Number.isFinite(Number(saldo))
@@ -192,10 +297,13 @@ export class ExtratolistComponent implements OnInit {
           );
         }
 
-        // CONFERE SE TODAS AS CONSULTAS FUNCIONARAM
+        // =====================================
+        // VERIFICAR SE TUDO FOI CARREGADO
+        // =====================================
+
         this.dadosCompletos =
-          entradas !== null &&
-          saidas !== null &&
+          this.entradasDisponiveis &&
+          this.saidasDisponiveis &&
           this.saldo !== null;
 
         this.erroCarregamento = avisos.join(' ');
@@ -211,66 +319,80 @@ export class ExtratolistComponent implements OnInit {
 
         this.erroCarregamento =
           'Não foi possível carregar o Extrato. ' +
-          'Verifique o Spring Boot.';
+          'Verifique se o Spring Boot está ligado.';
 
         this.carregando = false;
       }
-
     });
-
   }
 
   // =====================================
-  // TOTAL DE ENTRADAS
+  // SOMAR VALORES EM CENTAVOS
+  // EVITA PEQUENAS DIFERENCAS DECIMAIS
+  // =====================================
+
+  private somarEmUSD(valores: number[]): number {
+
+    const totalCentavos = valores.reduce(
+      (soma, valor) =>
+        soma + Math.round(valor * 100),
+      0
+    );
+
+    return totalCentavos / 100;
+  }
+
+  // =====================================
+  // TOTAL DE ENTRADAS EM USD
   // =====================================
 
   get totalEntradas(): number {
 
-    const soma = this.entradas.reduce(
-      (total, entrada) =>
-        total + Number(entrada.valor),
-      0
+    return this.somarEmUSD(
+      this.entradas.map(entrada =>
+        Number(entrada.valorUsd)
+      )
     );
-
-    return Math.round(soma * 100) / 100;
   }
 
   // =====================================
-  // TOTAL DE SAÍDAS
+  // TOTAL DE SAIDAS EM USD
   // =====================================
 
   get totalSaidas(): number {
 
-    const soma = this.saidas.reduce(
-      (total, saida) =>
-        total + Number(saida.valor),
-      0
+    return this.somarEmUSD(
+      this.saidas.map(saida =>
+        Number(saida.valorUsd)
+      )
     );
-
-    return Math.round(soma * 100) / 100;
   }
 
   // =====================================
-  // VERIFICAR SE O SALDO ESTÁ CORRETO
+  // COMPARAR SALDO DA API COM OS TOTAIS
+  // TODOS OS VALORES EM USD
   // =====================================
 
   get saldoDivergente(): boolean {
 
-    if (!this.dadosCompletos || this.saldo === null) {
+    if (
+      !this.dadosCompletos ||
+      this.saldo === null
+    ) {
       return false;
     }
 
-    const saldoCalculado = Math.round(
-      (this.totalEntradas - this.totalSaidas) * 100
-    ) / 100;
+    const saldoCalculado =
+      this.totalEntradas - this.totalSaidas;
 
     return Math.abs(
-      this.saldo - saldoCalculado
-    ) > 0.01;
+      Math.round(this.saldo * 100) -
+      Math.round(saldoCalculado * 100)
+    ) > 1;
   }
 
   // =====================================
-  // NORMALIZAR TEXTO
+  // NORMALIZAR TEXTO PARA BUSCA
   // =====================================
 
   private normalizarTexto(texto: string): string {
@@ -283,7 +405,7 @@ export class ExtratolistComponent implements OnInit {
   }
 
   // =====================================
-  // FILTRAR MOVIMENTAÇÕES
+  // FILTRAR MOVIMENTACOES
   // =====================================
 
   get movimentacoesFiltradas(): Movimentacao[] {
@@ -305,7 +427,7 @@ export class ExtratolistComponent implements OnInit {
         this.filtroTipo === 'todos' ||
         movimentacao.tipo === this.filtroTipo;
 
-      // FILTRO POR MÊS
+      // FILTRO POR MES
       const atendeMes =
         !this.filtroMes ||
         (
@@ -319,7 +441,6 @@ export class ExtratolistComponent implements OnInit {
         atendeTipo &&
         atendeMes
       );
-
     });
   }
 
@@ -335,17 +456,12 @@ export class ExtratolistComponent implements OnInit {
   }
 
   // =====================================
-  // FORMATAR VALOR EM REAIS
+  // FORMATAR TODOS OS VALORES EM USD
   // =====================================
 
-  private readonly formatadorMoeda =
-    new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL'
-    });
-
   formatarMoeda(valor: number): string {
-    return this.formatadorMoeda.format(valor);
+
+    return this.formatadorUSD.format(valor);
   }
 
   // =====================================
@@ -354,7 +470,10 @@ export class ExtratolistComponent implements OnInit {
 
   formatarData(dataHora: string | null): string {
 
-    if (!dataHora || !dataHora.includes('T')) {
+    if (
+      !dataHora ||
+      !dataHora.includes('T')
+    ) {
       return 'Data não disponível';
     }
 
@@ -369,7 +488,7 @@ export class ExtratolistComponent implements OnInit {
   }
 
   // =====================================
-  // IDENTIFICAR MOVIMENTAÇÃO
+  // IDENTIFICAR MOVIMENTACAO
   // =====================================
 
   identificarMovimentacao(
@@ -377,8 +496,7 @@ export class ExtratolistComponent implements OnInit {
     movimentacao: Movimentacao
   ): string {
 
-    // IDs de entrada e saída podem se repetir
+    // ENTRADAS E SAIDAS PODEM TER O MESMO ID
     return `${movimentacao.tipo}-${movimentacao.id}`;
   }
-
 }

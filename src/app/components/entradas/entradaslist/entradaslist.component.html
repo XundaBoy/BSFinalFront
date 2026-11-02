@@ -1,3 +1,4 @@
+
 <div class="entradas-page">
 
   <!-- CABEÇALHO -->
@@ -13,129 +14,309 @@
 
     <!-- TOTAL E FILTROS -->
     <section class="toolbar">
+
+      <!-- TOTAL DAS ENTRADAS EM DOLAR -->
       <div class="summary-badge">
-        <span>Total das entradas:</span>
-        <strong>{{ formatarMoeda(totalFiltrado) }}</strong>
+        <span>Total das entradas (USD):</span>
+        <strong>{{ formatarMoeda(totalFiltrado, 'USD') }}</strong>
       </div>
+
       <div class="filters">
+
+        <!-- FILTRO VALOR MINIMO EM USD -->
         <div class="filter-field">
-          <label for="valorMinimo">Valor maior que</label>
-          <input id="valorMinimo" type="number" min="0" step="0.01"
-                 placeholder="R$ Mínimo" [(ngModel)]="valorMinimo" />
+          <label for="valorMinimo">Valor maior que (USD)</label>
+
+          <input
+            id="valorMinimo"
+            type="number"
+            min="0"
+            step="0.01"
+            placeholder="US$ Mínimo"
+            [(ngModel)]="valorMinimo"
+          />
         </div>
+
+        <!-- FILTRO VALOR MAXIMO EM USD -->
         <div class="filter-field">
-          <label for="valorMaximo">Valor menor que</label>
-          <input id="valorMaximo" type="number" min="0" step="0.01"
-                 placeholder="R$ Máximo" [(ngModel)]="valorMaximo" />
+          <label for="valorMaximo">Valor menor que (USD)</label>
+
+          <input
+            id="valorMaximo"
+            type="number"
+            min="0"
+            step="0.01"
+            placeholder="US$ Máximo"
+            [(ngModel)]="valorMaximo"
+          />
         </div>
+
+        <!-- FILTRO POR MES -->
         <div class="filter-field filter-month">
           <label for="filtroMes">Mês (opcional)</label>
-          <input id="filtroMes" type="month" [(ngModel)]="filtroMes" />
+
+          <input
+            id="filtroMes"
+            type="month"
+            [(ngModel)]="filtroMes"
+          />
         </div>
-        <button type="button" class="clear-button" (click)="limparFiltros()">
+
+        <!-- LIMPAR FILTROS -->
+        <button
+          type="button"
+          class="clear-button"
+          (click)="limparFiltros()"
+        >
           Limpar filtros
         </button>
+
       </div>
     </section>
 
-    <!-- TÍTULO E NOVO CADASTRO (ABRE MODAL) -->
+    <!-- TITULO E NOVO CADASTRO -->
     <section class="page-heading">
+
       <div>
         <h1>Entradas</h1>
-        <p>Acompanhe e organize o dinheiro que você recebe.</p>
+
+        <p>
+          Acompanhe e organize o dinheiro que você recebe.
+        </p>
       </div>
-      <button type="button" class="new-button" (click)="abrirCadastro()">
-        <span class="plus-icon">+</span> Nova entrada
+
+      <!-- ABRE MODAL DE CADASTRO -->
+      <button
+        type="button"
+        class="new-button"
+        (click)="abrirCadastro()"
+      >
+        <span class="plus-icon">+</span>
+        Nova entrada
       </button>
+
     </section>
 
     <!-- TABELA -->
     <section class="table-card">
+
+      <!-- CABECALHO DA TABELA -->
       <div class="table-header">
+
         <div class="table-title">
           <h2>Entradas registradas</h2>
-          <span class="count-badge">{{ entradasFiltradas.length }}</span>
+
+          <span class="count-badge">
+            {{ entradasFiltradas.length }}
+          </span>
         </div>
+
+        <!-- BUSCA PELO NOME -->
         <div class="search-field">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-               stroke-width="2" aria-hidden="true">
+
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            aria-hidden="true"
+          >
             <circle cx="11" cy="11" r="7" />
             <path d="M20 20L16 16" />
           </svg>
-          <input type="search" placeholder="Buscar pelo nome"
-                 aria-label="Buscar entrada pelo nome" [(ngModel)]="filtroNome" />
+
+          <input
+            type="search"
+            placeholder="Buscar pelo nome"
+            aria-label="Buscar entrada pelo nome"
+            [(ngModel)]="filtroNome"
+          />
+
         </div>
       </div>
 
-      <div class="api-status" *ngIf="carregando" role="status">
+      <!-- CARREGAMENTO -->
+      <div
+        class="api-status"
+        *ngIf="carregando"
+        role="status"
+      >
         Carregando entradas do banco de dados...
       </div>
-      <div class="api-status api-error" *ngIf="erroCarregamento" role="alert">
+
+      <!-- ERRO DA API -->
+      <div
+        class="api-status api-error"
+        *ngIf="erroCarregamento"
+        role="alert"
+      >
         <span>{{ erroCarregamento }}</span>
-        <button type="button" (click)="carregarEntradas()">Tentar novamente</button>
+
+        <button
+          type="button"
+          (click)="carregarEntradas()"
+        >
+          Tentar novamente
+        </button>
       </div>
 
       <!-- SOMENTE A TABELA ROLA -->
-      <div class="table-wrapper" (scroll)="fecharMenu()">
+      <div
+        class="table-wrapper"
+        (scroll)="fecharMenu()"
+      >
+
         <table>
+
           <thead>
             <tr>
               <th>Nome</th>
-              <th>Valor</th>
+              <th>Valor original / USD</th>
               <th>Data/hora</th>
               <th class="actions-heading">Ações</th>
             </tr>
           </thead>
+
           <tbody>
-            <ng-container *ngIf="entradasFiltradas.length > 0; else semRegistros">
-              <tr *ngFor="let entrada of entradasFiltradas; trackBy: identificarEntrada">
-                <td class="entry-name">{{ entrada.nomeEntrada }}</td>
-                <td class="entry-value">{{ formatarMoeda(entrada.valor) }}</td>
-                <td class="entry-date">{{ formatarData(entrada.dataHora) }}</td>
+
+            <ng-container
+              *ngIf="entradasFiltradas.length > 0; else semRegistros"
+            >
+
+              <tr
+                *ngFor="
+                  let entrada of entradasFiltradas;
+                  trackBy: identificarEntrada
+                "
+              >
+
+                <!-- NOME DA ENTRADA -->
+                <td class="entry-name">
+                  {{ entrada.nomeEntrada }}
+                </td>
+
+                <!-- VALOR ORIGINAL E VALOR EM DOLAR -->
+                <td class="entry-value">
+
+                  <!-- VALOR NA MOEDA CADASTRADA -->
+                  <div class="entry-original">
+                    {{
+                      formatarMoeda(
+                        entrada.valor,
+                        entrada.moedaOriginal
+                      )
+                    }}
+                  </div>
+
+                  <!-- VALOR CONVERTIDO EM USD -->
+                  <div class="entry-usd">
+                    {{
+                      formatarMoeda(
+                        entrada.valorUsd,
+                        'USD'
+                      )
+                    }}
+                  </div>
+
+                </td>
+
+                <!-- DATA E HORA -->
+                <td class="entry-date">
+                  {{ formatarData(entrada.dataHora) }}
+                </td>
+
+                <!-- MENU DOS TRES PONTINHOS -->
                 <td class="actions-heading">
-                  <!-- TRÊS PONTINHOS -->
+
                   <div class="row-actions">
+
                     <button
                       type="button"
                       class="more-button"
-                      [attr.aria-label]="'Opções de ' + entrada.nomeEntrada"
+                      [attr.aria-label]="
+                        'Opções de ' + entrada.nomeEntrada
+                      "
                       aria-haspopup="menu"
-                      [attr.aria-expanded]="menuAbertoId === entrada.id"
+                      [attr.aria-expanded]="
+                        menuAbertoId === entrada.id
+                      "
                       (click)="alternarMenu(entrada.id, $event)"
                     >
-                      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                        aria-hidden="true"
+                      >
                         <circle cx="12" cy="5" r="2" />
                         <circle cx="12" cy="12" r="2" />
                         <circle cx="12" cy="19" r="2" />
                       </svg>
+
                     </button>
+
                   </div>
+
                 </td>
+
               </tr>
+
             </ng-container>
 
+            <!-- QUANDO NAO EXISTEM REGISTROS -->
             <ng-template #semRegistros>
+
               <tr>
                 <td colspan="4" class="empty-state">
+
                   <div class="empty-icon">⌕</div>
-                  <strong>Nenhuma entrada encontrada</strong>
-                  <p>Tente alterar os filtros ou cadastre uma nova entrada.</p>
+
+                  <strong>
+                    Nenhuma entrada encontrada
+                  </strong>
+
+                  <p>
+                    Tente alterar os filtros ou cadastre uma nova entrada.
+                  </p>
+
                 </td>
               </tr>
+
             </ng-template>
+
           </tbody>
         </table>
+
       </div>
+
     </section>
 
+    <!-- RODAPE DA LISTAGEM -->
     <footer class="list-footer">
-      <span>Exibindo {{ entradasFiltradas.length }} de {{ entradas.length }} entradas</span>
-      <span>Role a lista para visualizar mais registros</span>
+
+      <span>
+        Exibindo
+        {{ entradasFiltradas.length }}
+        de
+        {{ entradas.length }}
+        entradas
+      </span>
+
+      <span>
+        Role a lista para visualizar mais registros
+      </span>
+
     </footer>
+
   </main>
+
 </div>
 
-<!-- MENU FLUTUANTE FORA DA TABELA: NÃO FICA CORTADO PELA ROLAGEM -->
+
+<!-- ====================================== -->
+<!-- MENU FLUTUANTE DOS TRES PONTINHOS     -->
+<!-- ====================================== -->
+
 <div
   *ngIf="entradaMenuSelecionada as selecionada"
   class="action-dropdown"
@@ -144,37 +325,75 @@
   [style.left.px]="menuLeft"
   (click)="$event.stopPropagation()"
 >
-  <button type="button" class="dropdown-option" role="menuitem"
-          (click)="abrirEdicao()">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-         stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
-         aria-hidden="true">
+
+  <!-- EDITAR -->
+  <button
+    type="button"
+    class="dropdown-option"
+    role="menuitem"
+    (click)="abrirEdicao()"
+  >
+
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.8"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+    >
       <path d="M12 20h9" />
-      <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L9 17l-4 1 1-4Z" />
+      <path
+        d="M16.5 3.5a2.1 2.1 0 0 1 3 3L9 17l-4 1 1-4Z"
+      />
     </svg>
+
     Editar
+
   </button>
-  <button type="button" class="dropdown-option delete-option" role="menuitem"
-          (click)="excluirSelecionada()">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-         stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
-         aria-hidden="true">
+
+  <!-- EXCLUIR -->
+  <button
+    type="button"
+    class="dropdown-option delete-option"
+    role="menuitem"
+    (click)="excluirSelecionada()"
+  >
+
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.8"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+    >
       <path d="M3 6h18" />
       <path d="M8 6V4h8v2" />
       <path d="M5 6l1 15h12l1-15" />
       <path d="M10 11v6" />
       <path d="M14 11v6" />
     </svg>
+
     Excluir
+
   </button>
+
 </div>
 
-<!-- MODAL CENTRALIZADO: CADASTRO E EDIÇÃO NO MESMO FORMULÁRIO -->
+
+<!-- ====================================== -->
+<!-- MODAL CENTRALIZADO DE CADASTRO/EDICAO -->
+<!-- ====================================== -->
+
 <div
   *ngIf="entradaEmEdicao || criandoEntrada"
   class="edit-overlay"
   (click)="fecharEdicao()"
 >
+
   <div
     class="edit-dialog"
     role="dialog"
@@ -182,11 +401,15 @@
     aria-labelledby="titulo-entrada-modal"
     (click)="$event.stopPropagation()"
   >
+
     <app-entradasdetails
       [emModal]="true"
       [entradaParaEditar]="entradaEmEdicao"
       (salvo)="aoSalvarEdicao()"
       (cancelado)="fecharEdicao()"
-    ></app-entradasdetails>
+    >
+    </app-entradasdetails>
+
   </div>
+
 </div>

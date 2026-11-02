@@ -4,7 +4,16 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 // =====================================
-// MODELO DE SAÍDA
+// MOEDAS DISPONIVEIS
+// =====================================
+
+export type Moeda = 'BRL' | 'PYG' | 'USD';
+
+export type OrigemCotacao =
+  'AUTOMATICA' | 'MANUAL';
+
+// =====================================
+// MODELO DE SAIDA
 // =====================================
 
 export interface Saida {
@@ -12,6 +21,12 @@ export interface Saida {
   nomeSaida: string;
   valor: number;
   dataHora: string;
+
+  moedaOriginal: Moeda;
+  cotacaoPorUsd: number;
+  valorUsd: number;
+  origemCotacao: OrigemCotacao;
+  dataCotacao: string | null;
 }
 
 // =====================================
@@ -21,10 +36,13 @@ export interface Saida {
 export interface SaidaPayload {
   nomeSaida: string;
   valor: number;
+  moedaOriginal: Moeda;
+  origemCotacao: OrigemCotacao;
+  cotacaoPorUsd?: number;
 }
 
 // =====================================
-// SERVICE DE SAÍDAS
+// SERVICE DE SAIDAS
 // =====================================
 
 @Injectable({
@@ -32,25 +50,19 @@ export interface SaidaPayload {
 })
 export class SaidasService {
 
-  private http = inject(HttpClient);
+  private readonly http = inject(HttpClient);
 
-  // ENDEREÇO DO BACKEND
-  private readonly API = 'http://localhost:8080/api/saidas';
+  private readonly API =
+    'http://localhost:8080/api/saidas';
 
-  // =====================================
-  // LISTAR TODAS AS SAÍDAS
-  // =====================================
-
+  // LISTAR TODAS AS SAIDAS
   findAll(): Observable<Saida[]> {
     return this.http.get<Saida[]>(
       `${this.API}/findAll`
     );
   }
 
-  // =====================================
-  // CADASTRAR SAÍDA
-  // =====================================
-
+  // CADASTRAR SAIDA
   save(saida: SaidaPayload): Observable<string> {
     return this.http.post(
       `${this.API}/save`,
@@ -59,10 +71,7 @@ export class SaidasService {
     );
   }
 
-  // =====================================
-  // EDITAR SAÍDA
-  // =====================================
-
+  // EDITAR SAIDA
   updateById(
     id: number,
     saida: SaidaPayload
@@ -75,10 +84,7 @@ export class SaidasService {
     );
   }
 
-  // =====================================
-  // EXCLUIR SAÍDA
-  // =====================================
-
+  // EXCLUIR SAIDA
   deleteById(id: number): Observable<string> {
     return this.http.delete(
       `${this.API}/deleteById/${id}`,

@@ -1,15 +1,32 @@
-import { Component, OnInit, HostListener, inject } from '@angular/core';
+
+import {
+  Component,
+  OnInit,
+  HostListener,
+  inject
+} from '@angular/core';
+
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
-import { SaidasdetailsComponent } from '../saidasdetails/saidasdetails.component';
-import { SaidasService, type Saida } from '../../../services/saidas.service';
 
+import {
+  SaidasdetailsComponent
+} from '../saidasdetails/saidasdetails.component';
+
+import {
+  SaidasService,
+  type Saida
+} from '../../../services/saidas.service';
 
 @Component({
   selector: 'app-saidaslist',
   standalone: true,
-  imports: [CommonModule, FormsModule, SaidasdetailsComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    SaidasdetailsComponent
+  ],
   templateUrl: './saidaslist.component.html',
   styleUrl: './saidaslist.component.scss'
 })
@@ -17,7 +34,12 @@ export class SaidaslistComponent implements OnInit {
 
   private readonly api = inject(SaidasService);
 
+  // =====================================
+  // LISTA DE SAIDAS
+  // =====================================
+
   saidas: Saida[] = [];
+
   carregando = false;
   erroCarregamento = '';
 
@@ -25,38 +47,53 @@ export class SaidaslistComponent implements OnInit {
     this.carregarSaidas();
   }
 
+  // =====================================
+  // CARREGAR SAIDAS DO BACKEND
+  // =====================================
+
   carregarSaidas(): void {
+
     this.carregando = true;
     this.erroCarregamento = '';
 
     this.api.findAll().subscribe({
+
       next: registros => {
+
         this.saidas = registros;
         this.carregando = false;
       },
+
       error: erro => {
-        console.error('Erro ao carregar saidas:', erro);
+
+        console.error(
+          'Erro ao carregar saídas:',
+          erro
+        );
+
         this.carregando = false;
+
         this.erroCarregamento = erro.status === 0
           ? 'Sem conexão com o Spring Boot. Confirme a porta e o CORS.'
-          : 'Não foi possível carregar saidas do banco de dados.';
+          : 'Não foi possível carregar saídas do banco de dados.';
       }
     });
   }
 
   // =====================================
-  // VARIÁVEIS DOS FILTROS
+  // FILTROS
   // =====================================
 
   filtroNome: string = '';
   filtroMes: string = '';
 
+  // FILTROS FINANCEIROS EM USD
   valorMinimo: number | null = null;
   valorMaximo: number | null = null;
 
   // =====================================
-  // NORMALIZAÇÃO DO NOME
-  // IGNORA ACENTOS E MAIÚSCULAS
+  // NORMALIZAR TEXTO
+  // IGNORA ACENTOS E MAIUSCULAS
   // =====================================
 
   private normalizarTexto(texto: string): string {
@@ -66,11 +103,10 @@ export class SaidaslistComponent implements OnInit {
       .replace(/[\u0300-\u036f]/g, '')
       .toLocaleLowerCase('pt-BR')
       .trim();
-
   }
 
   // =====================================
-  // FILTRAR SAÍDAS
+  // FILTRAR SAIDAS
   // =====================================
 
   get saidasFiltradas(): Saida[] {
@@ -83,30 +119,29 @@ export class SaidaslistComponent implements OnInit {
 
       .filter((saida) => {
 
-        // NORMALIZA O NOME REGISTRADO
+        // FILTRO POR NOME
         const nomeNormalizado = this.normalizarTexto(
           saida.nomeSaida
         );
 
-        // FILTRO POR NOME
         const atendeNome =
           !nomePesquisado ||
           nomeNormalizado.includes(nomePesquisado);
 
-        // FILTRO POR MÊS
+        // FILTRO POR MES
         const atendeMes =
           !this.filtroMes ||
           saida.dataHora.startsWith(this.filtroMes);
 
-        // VALOR ESTRITAMENTE MAIOR
+        // VALOR MINIMO EM USD
         const atendeMinimo =
           this.valorMinimo == null ||
-          saida.valor > this.valorMinimo;
+          saida.valorUsd > this.valorMinimo;
 
-        // VALOR ESTRITAMENTE MENOR
+        // VALOR MAXIMO EM USD
         const atendeMaximo =
           this.valorMaximo == null ||
-          saida.valor < this.valorMaximo;
+          saida.valorUsd < this.valorMaximo;
 
         return (
           atendeNome &&
@@ -114,34 +149,46 @@ export class SaidaslistComponent implements OnInit {
           atendeMinimo &&
           atendeMaximo
         );
-
       })
 
       // MAIS RECENTES PRIMEIRO
       .sort((a, b) =>
         b.dataHora.localeCompare(a.dataHora)
       );
-
   }
 
   // =====================================
-  // FORMATAÇÃO DE MOEDA
+  // FORMATAR BRL, PYG E USD
   // =====================================
 
-  private readonly formatadorMoeda =
-    new Intl.NumberFormat('pt-BR', {
+  formatarMoeda(
+    valor: number,
+    moeda: Saida['moedaOriginal'] = 'USD'
+  ): string {
+
+    if (moeda === 'PYG') {
+
+      const formatado = new Intl.NumberFormat(
+        'es-PY',
+        {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0
+        }
+      ).format(valor);
+
+      return `₲ ${formatado}`;
+    }
+
+    return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
-      currency: 'BRL'
-    });
-
-  formatarMoeda(valor: number): string {
-
-    return this.formatadorMoeda.format(valor);
-
+      currency: moeda,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }).format(valor);
   }
 
   // =====================================
-  // FORMATAÇÃO DE DATA E HORA
+  // FORMATAR DATA E HORA
   // =====================================
 
   formatarData(dataHora: string): string {
@@ -150,20 +197,18 @@ export class SaidaslistComponent implements OnInit {
     const [ano, mes, dia] = data.split('-');
 
     return `${dia}/${mes}/${ano} às ${hora.slice(0, 5)}`;
-
   }
 
   // =====================================
-  // TOTAL DAS SAÍDAS FILTRADAS
+  // TOTAL DAS SAIDAS EM USD
   // =====================================
 
   get totalFiltrado(): number {
 
     return this.saidasFiltradas.reduce(
-      (total, saida) => total + saida.valor,
+      (total, saida) => total + saida.valorUsd,
       0
     );
-
   }
 
   // =====================================
@@ -177,38 +222,66 @@ export class SaidaslistComponent implements OnInit {
 
     this.valorMinimo = null;
     this.valorMaximo = null;
-
   }
 
   // =====================================
-  // EXCLUIR SAIDA NO BACKEND
+  // EXCLUIR SAIDA
   // =====================================
+
   async excluirSaida(id: number): Promise<void> {
-    const item = this.saidas.find(registro => registro.id === id);
-    if (!item) return;
+
+    const item = this.saidas.find(
+      registro => registro.id === id
+    );
+
+    if (!item) {
+      return;
+    }
 
     const resultado = await Swal.fire({
+
       titleText: 'Confirmar exclusão',
+
       icon: 'warning',
+
       iconHtml: `
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
-          viewBox="0 0 24 24" fill="none" stroke="currentColor"
-          stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M3 6h18"/><path d="M8 6V4h8v2"/>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M3 6h18"/>
+          <path d="M8 6V4h8v2"/>
           <path d="M5 6l1 15h12l1-15"/>
-          <path d="M10 11v6"/><path d="M14 11v6"/>
-        </svg>`,
-      text: `Tem certeza que deseja excluir "${item.nomeSaida}"?\n` +
+          <path d="M10 11v6"/>
+          <path d="M14 11v6"/>
+        </svg>
+      `,
+
+      text:
+        `Tem certeza que deseja excluir "${item.nomeSaida}"?\n` +
         'Esta ação não poderá ser desfeita.',
+
       showCloseButton: true,
       showCancelButton: true,
+
       confirmButtonText: 'Excluir',
       cancelButtonText: 'Cancelar',
+
       reverseButtons: true,
       focusCancel: true,
+
       buttonsStyling: false,
+
       background: '#4b4b57',
       color: '#ffffff',
+
       customClass: {
         popup: 'bs-delete-popup',
         title: 'bs-delete-title',
@@ -221,16 +294,21 @@ export class SaidaslistComponent implements OnInit {
       }
     });
 
-    if (!resultado.isConfirmed) return;
+    if (!resultado.isConfirmed) {
+      return;
+    }
 
     this.api.deleteById(id).subscribe({
+
       next: () => {
+
         this.carregarSaidas();
+
         void Swal.fire({
           toast: true,
           position: 'top-end',
           icon: 'success',
-          titleText: 'Saida excluída com sucesso!',
+          titleText: 'Saída excluída com sucesso!',
           showConfirmButton: false,
           timer: 2000,
           timerProgressBar: true,
@@ -238,13 +316,18 @@ export class SaidaslistComponent implements OnInit {
           color: '#302c70'
         });
       },
+
       error: erro => {
-        console.error('Erro ao excluir saida:', erro);
+
+        console.error('Erro ao excluir saída:', erro);
+
         void Swal.fire({
           titleText: 'Erro ao excluir',
+
           text: erro.status === 0
             ? 'Não foi possível conectar ao Spring Boot.'
             : 'Não foi possível excluir esta saída no banco de dados.',
+
           icon: 'error',
           confirmButtonColor: '#6355d9'
         });
@@ -253,7 +336,7 @@ export class SaidaslistComponent implements OnInit {
   }
 
   // =====================================
-  // IDENTIFICA CADA SAÍDA PELO ID
+  // IDENTIFICAR SAIDA PELO ID
   // =====================================
 
   identificarSaida(
@@ -262,118 +345,204 @@ export class SaidaslistComponent implements OnInit {
   ): number {
 
     return saida.id;
-
   }
 
+  // =====================================
+  // MENU DOS TRES PONTINHOS
+  // =====================================
 
-// =====================================
-// MENU DE AÇÕES E MODAL DE EDIÇÃO
-// =====================================
-menuAbertoId: number | null = null;
-menuTop = 0;
-menuLeft = 0;
-saidaEmEdicao: Saida | null = null;
-criandoSaida = false;
+  menuAbertoId: number | null = null;
 
-get saidaMenuSelecionada(): Saida | null {
-  return this.saidas.find(item => item.id === this.menuAbertoId) ?? null;
-}
+  menuTop = 0;
+  menuLeft = 0;
 
-alternarMenu(id: number, evento: MouseEvent): void {
-  evento.stopPropagation();
+  saidaEmEdicao: Saida | null = null;
+  criandoSaida = false;
 
-  if (this.menuAbertoId === id) {
+  // =====================================
+  // SAIDA SELECIONADA
+  // =====================================
+
+  get saidaMenuSelecionada(): Saida | null {
+
+    return this.saidas.find(
+      item => item.id === this.menuAbertoId
+    ) ?? null;
+  }
+
+  // =====================================
+  // ALTERNAR MENU
+  // =====================================
+
+  alternarMenu(
+    id: number,
+    evento: MouseEvent
+  ): void {
+
+    evento.stopPropagation();
+
+    if (this.menuAbertoId === id) {
+      this.fecharMenu();
+      return;
+    }
+
+    const botao =
+      evento.currentTarget as HTMLElement;
+
+    const posicao =
+      botao.getBoundingClientRect();
+
+    const largura = 180;
+    const altura = 102;
+    const margem = 12;
+
+    this.menuLeft = Math.max(
+      margem,
+      Math.min(
+        posicao.right - largura,
+        window.innerWidth - largura - margem
+      )
+    );
+
+    this.menuTop =
+      posicao.bottom + altura + margem >
+      window.innerHeight
+        ? Math.max(
+            margem,
+            posicao.top - altura - 6
+          )
+        : posicao.bottom + 6;
+
+    this.menuAbertoId = id;
+  }
+
+  // =====================================
+  // FECHAR MENU
+  // =====================================
+
+  fecharMenu(): void {
+    this.menuAbertoId = null;
+  }
+
+  // =====================================
+  // FECHAR MENU AO CLICAR FORA
+  // =====================================
+
+  @HostListener('document:click')
+  fecharMenuAoClicarFora(): void {
     this.fecharMenu();
-    return;
   }
 
-  const botao = evento.currentTarget as HTMLElement;
-  const posicao = botao.getBoundingClientRect();
-  const largura = 180;
-  const altura = 102;
-  const margem = 12;
+  // =====================================
+  // FECHAR MENU AO REDIMENSIONAR
+  // =====================================
 
-  this.menuLeft = Math.max(margem, Math.min(
-    posicao.right - largura,
-    window.innerWidth - largura - margem
-  ));
+  @HostListener('window:resize')
+  fecharMenuAoRedimensionar(): void {
+    this.fecharMenu();
+  }
 
-  this.menuTop = posicao.bottom + altura + margem > window.innerHeight
-    ? Math.max(margem, posicao.top - altura - 6)
-    : posicao.bottom + 6;
+  // =====================================
+  // TECLA ESC
+  // =====================================
 
-  this.menuAbertoId = id;
-}
+  @HostListener('document:keydown.escape')
+  fecharComEscape(): void {
 
-fecharMenu(): void {
-  this.menuAbertoId = null;
-}
+    this.fecharMenu();
+    this.fecharEdicao();
+  }
 
-@HostListener('document:click')
-fecharMenuAoClicarFora(): void {
-  this.fecharMenu();
-}
+  // =====================================
+  // ABRIR CADASTRO
+  // =====================================
 
-@HostListener('window:resize')
-fecharMenuAoRedimensionar(): void {
-  this.fecharMenu();
-}
+  abrirCadastro(): void {
 
-@HostListener('document:keydown.escape')
-fecharComEscape(): void {
-  this.fecharMenu();
-  this.fecharEdicao();
-}
+    this.fecharMenu();
 
-// Novo registro: utiliza o details com campos vazios.
-abrirCadastro(): void {
-  this.fecharMenu();
-  this.saidaEmEdicao = null;
-  this.criandoSaida = true;
-}
+    this.saidaEmEdicao = null;
+    this.criandoSaida = true;
+  }
 
-// Editar: utiliza o details preenchido com o registro selecionado.
-abrirEdicao(): void {
-  const selecionada = this.saidaMenuSelecionada;
-  this.fecharMenu();
+  // =====================================
+  // ABRIR EDICAO
+  // =====================================
 
-  if (!selecionada) return;
+  abrirEdicao(): void {
 
-  this.criandoSaida = false;
-  // Cópia para preservar os dados até o usuário clicar em Salvar.
-  this.saidaEmEdicao = { ...selecionada };
-}
+    const selecionada =
+      this.saidaMenuSelecionada;
 
-fecharEdicao(): void {
-  this.saidaEmEdicao = null;
-  this.criandoSaida = false;
-}
+    this.fecharMenu();
 
-// Executado depois que o backend confirmou o salvamento.
-aoSalvarEdicao(): void {
-  const eraCadastro = this.criandoSaida;
-  this.fecharEdicao();
-  this.carregarSaidas();
-  void Swal.fire({
-    toast: true,
-    position: 'top-end',
-    icon: 'success',
-    titleText: eraCadastro
-      ? 'Saida cadastrada com sucesso!'
-      : 'Saida atualizada com sucesso!',
-    showConfirmButton: false,
-    timer: 1800,
-    timerProgressBar: true,
-    background: '#ffffff',
-    color: '#302c70'
-  });
-}
+    if (!selecionada) {
+      return;
+    }
 
-// Usa o SweetAlert2 já existente no método excluirSaida().
-excluirSelecionada(): void {
-  const id = this.menuAbertoId;
-  this.fecharMenu();
-  if (id !== null) void this.excluirSaida(id);
-}
+    this.criandoSaida = false;
 
+    // FAZ UMA COPIA ANTES DE EDITAR
+    this.saidaEmEdicao = {
+      ...selecionada
+    };
+  }
+
+  // =====================================
+  // FECHAR MODAL
+  // =====================================
+
+  fecharEdicao(): void {
+
+    this.saidaEmEdicao = null;
+    this.criandoSaida = false;
+  }
+
+  // =====================================
+  // APOS SALVAR CADASTRO OU EDICAO
+  // =====================================
+
+  aoSalvarEdicao(): void {
+
+    const eraCadastro = this.criandoSaida;
+
+    this.fecharEdicao();
+
+    // ATUALIZA COM OS DADOS CONVERTIDOS
+    this.carregarSaidas();
+
+    void Swal.fire({
+
+      toast: true,
+      position: 'top-end',
+      icon: 'success',
+
+      titleText: eraCadastro
+        ? 'Saída cadastrada com sucesso!'
+        : 'Saída atualizada com sucesso!',
+
+      showConfirmButton: false,
+
+      timer: 1800,
+      timerProgressBar: true,
+
+      background: '#ffffff',
+      color: '#302c70'
+    });
+  }
+
+  // =====================================
+  // EXCLUIR PELO MENU
+  // =====================================
+
+  excluirSelecionada(): void {
+
+    const id = this.menuAbertoId;
+
+    this.fecharMenu();
+
+    if (id !== null) {
+      void this.excluirSaida(id);
+    }
+  }
 }

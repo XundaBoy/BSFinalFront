@@ -247,3 +247,24 @@ body{
     min-width: 0;
   }
 }
+
+
+
+// =====================================
+// AJUSTE PARA O LAYOUT COM BARRA SUPERIOR
+// =====================================
+
+// AS PAGINAS PASSAM A OCUPAR SOMENTE
+// O ESPACO DISPONIVEL ABAIXO DO CABECALHO.
+
+.app-content .entradas-page,
+.app-content .saidas-page,
+.app-content .extrato-page {
+  height: 100%;
+  min-height: 0;
+}
+
+// FORMULARIOS ACESSADOS FORA DO MODAL
+.app-content .details-page:not(.modal-mode) {
+  min-height: 100%;
+}

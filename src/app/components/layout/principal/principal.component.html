@@ -1,10 +1,89 @@
 
 <div class="app-layout">
 
+  <!-- ===================================== -->
+  <!-- SIDEBAR ESQUERDA -->
+  <!-- ===================================== -->
+
   <app-menu></app-menu>
 
-  <main class="app-content">
-    <router-outlet></router-outlet>
-  </main>
+  <!-- ===================================== -->
+  <!-- AREA PRINCIPAL -->
+  <!-- ===================================== -->
+
+  <div class="app-workspace">
+
+    <!-- ===================================== -->
+    <!-- BARRA SUPERIOR FIXA -->
+    <!-- ===================================== -->
+
+    <header class="principal-topbar">
+
+      <!-- ESPACO LIVRE A ESQUERDA -->
+      <div class="topbar-spacer"></div>
+
+      <!-- ===================================== -->
+      <!-- IDENTIFICACAO DO USUARIO LOGADO -->
+      <!-- ===================================== -->
+
+      <div class="user-profile">
+
+        <!-- ICONE DO USUARIO -->
+        <div
+          class="user-avatar"
+          aria-hidden="true"
+        >
+
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+
+            <circle
+              cx="12"
+              cy="8"
+              r="4"
+            />
+
+            <path
+              d="M4 21C4 16.6 7.6 13 12 13S20 16.6 20 21"
+            />
+
+          </svg>
+
+        </div>
+
+        <!-- NOME E BOAS VINDAS -->
+        <div class="user-information">
+
+          <span class="user-name">
+            {{ nomeUsuario }}
+          </span>
+
+          <span class="welcome-message">
+            Bem-vindo(a)
+          </span>
+
+        </div>
+
+      </div>
+
+    </header>
+
+    <!-- ===================================== -->
+    <!-- PAGINAS DO SISTEMA -->
+    <!-- ===================================== -->
+
+    <main class="app-content">
+
+      <router-outlet></router-outlet>
+
+    </main>
+
+  </div>
 
 </div>

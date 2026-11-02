@@ -1,30 +1,41 @@
 
 <div class="extrato-page">
 
-  <!-- CABEÇALHO -->
+  <!-- ================================= -->
+  <!-- CABECALHO -->
+  <!-- ================================= -->
+
   <header class="topbar">
+
     <div class="breadcrumb">
       <span>Financeiro</span>
       <span class="separator">›</span>
       <strong>Extrato</strong>
     </div>
+
   </header>
 
   <main class="page-content">
 
-    <!-- TÍTULO -->
+    <!-- ================================= -->
+    <!-- TITULO -->
+    <!-- ================================= -->
+
     <section class="page-heading">
 
       <h1>Extrato financeiro</h1>
 
       <p>
-        Acompanhe suas movimentações e consulte
-        o saldo acumulado.
+        Acompanhe suas movimentações em dólar
+        e consulte o saldo acumulado.
       </p>
 
     </section>
 
+    <!-- ================================= -->
     <!-- CARREGAMENTO -->
+    <!-- ================================= -->
+
     <p
       *ngIf="carregando"
       role="status"
@@ -33,7 +44,10 @@
       Carregando extrato do banco de dados...
     </p>
 
-    <!-- ERRO DE CONEXÃO -->
+    <!-- ================================= -->
+    <!-- ERRO DE CONEXAO -->
+    <!-- ================================= -->
+
     <p
       *ngIf="erroCarregamento"
       role="alert"
@@ -42,29 +56,39 @@
       {{ erroCarregamento }}
     </p>
 
-    <!-- AVISO DE DIVERGÊNCIA DO SALDO -->
+    <!-- ================================= -->
+    <!-- AVISO DE DIVERGENCIA DO SALDO -->
+    <!-- ================================= -->
+
     <p
       *ngIf="saldoDivergente"
       role="alert"
       style="color: #9a6400; font-size: 12px; margin: 0;"
     >
-      Atenção: o saldo retornado pela API é diferente
-      de entradas menos saídas. Precisamos conferir
-      as consultas de soma no backend.
+      Atenção: o saldo em USD retornado pela API
+      é diferente do total de entradas menos saídas.
+      Precisamos conferir as consultas de soma
+      no backend.
     </p>
 
     <!-- ================================= -->
-    <!-- CARDS -->
+    <!-- CARDS DE RESUMO -->
     <!-- ================================= -->
 
     <section class="summary-grid">
 
-      <!-- SALDO -->
+      <!-- ================================= -->
+      <!-- SALDO ACUMULADO EM USD -->
+      <!-- ================================= -->
+
       <div class="summary-card saldo-card">
 
         <div class="card-top">
-          <span>Saldo acumulado</span>
+
+          <span>Saldo acumulado (USD)</span>
+
           <span class="card-icon">◈</span>
+
         </div>
 
         <strong
@@ -79,51 +103,72 @@
         </strong>
 
         <small>
-          Entradas menos saídas (calculado pelo banco)
+          Entradas menos saídas em dólar
+          (calculado pelo banco)
         </small>
 
       </div>
 
-      <!-- ENTRADAS -->
+      <!-- ================================= -->
+      <!-- TOTAL DE ENTRADAS EM USD -->
+      <!-- ================================= -->
+
       <div class="summary-card entradas-card">
 
         <div class="card-top">
-          <span>Total de entradas</span>
+
+          <span>Total de entradas (USD)</span>
+
           <span class="card-icon">↗</span>
+
         </div>
 
         <strong class="card-value">
           {{
-            carregando
+            carregando || !entradasDisponiveis
               ? '—'
               : formatarMoeda(totalEntradas)
           }}
         </strong>
 
         <small>
-          {{ entradas.length }} recebimentos
+          {{
+            entradasDisponiveis
+              ? entradas.length + ' recebimentos'
+              : 'Dados indisponíveis'
+          }}
         </small>
 
       </div>
 
-      <!-- SAÍDAS -->
+      <!-- ================================= -->
+      <!-- TOTAL DE SAIDAS EM USD -->
+      <!-- ================================= -->
+
       <div class="summary-card saidas-card">
 
         <div class="card-top">
-          <span>Total de saídas</span>
+
+          <span>Total de saídas (USD)</span>
+
           <span class="card-icon">↘</span>
+
         </div>
 
         <strong class="card-value">
           {{
-            carregando
+            carregando || !saidasDisponiveis
               ? '—'
               : formatarMoeda(totalSaidas)
           }}
         </strong>
 
         <small>
-          {{ saidas.length }} despesas
+          {{
+            saidasDisponiveis
+              ? saidas.length + ' despesas'
+              : 'Dados indisponíveis'
+          }}
         </small>
 
       </div>
@@ -141,17 +186,20 @@
         <h2>Filtrar movimentações</h2>
 
         <p>
-          Os filtros não alteram o saldo acumulado.
+          Os filtros não alteram o saldo acumulado
+          nem os totais gerais em USD.
         </p>
 
       </div>
 
       <div class="filters">
 
-        <!-- NOME -->
+        <!-- FILTRO POR NOME -->
         <div class="filter-field search-filter">
 
-          <label for="filtroNome">Nome</label>
+          <label for="filtroNome">
+            Nome
+          </label>
 
           <input
             id="filtroNome"
@@ -163,27 +211,39 @@
 
         </div>
 
-        <!-- TIPO -->
+        <!-- FILTRO POR TIPO -->
         <div class="filter-field">
 
-          <label for="filtroTipo">Tipo</label>
+          <label for="filtroTipo">
+            Tipo
+          </label>
 
           <select
             id="filtroTipo"
             name="filtroTipo"
             [(ngModel)]="filtroTipo"
           >
-            <option value="todos">Todas</option>
-            <option value="entrada">Entradas</option>
-            <option value="saida">Saídas</option>
+            <option value="todos">
+              Todas
+            </option>
+
+            <option value="entrada">
+              Entradas
+            </option>
+
+            <option value="saida">
+              Saídas
+            </option>
           </select>
 
         </div>
 
-        <!-- MÊS -->
+        <!-- FILTRO POR MES -->
         <div class="filter-field">
 
-          <label for="filtroMes">Mês (opcional)</label>
+          <label for="filtroMes">
+            Mês (opcional)
+          </label>
 
           <input
             id="filtroMes"
@@ -208,7 +268,7 @@
     </section>
 
     <!-- ================================= -->
-    <!-- HISTÓRICO DE MOVIMENTAÇÕES -->
+    <!-- HISTORICO DE MOVIMENTACOES -->
     <!-- ================================= -->
 
     <section class="table-card">
@@ -226,23 +286,28 @@
         </div>
 
         <span class="read-only-label">
-          Somente consulta
+          Somente consulta · USD
         </span>
 
       </div>
 
+      <!-- ================================= -->
       <!-- TABELA COM ROLAGEM -->
+      <!-- ================================= -->
+
       <div class="table-wrapper">
 
         <table>
 
           <thead>
+
             <tr>
               <th>Movimentação</th>
               <th>Tipo</th>
-              <th>Valor</th>
+              <th>Valor (USD)</th>
               <th>Data/hora</th>
             </tr>
+
           </thead>
 
           <tbody>
@@ -251,7 +316,7 @@
               *ngIf="!carregando; else carregandoTabela"
             >
 
-              <!-- MOVIMENTAÇÕES -->
+              <!-- MOVIMENTACOES -->
               <ng-container
                 *ngIf="
                   movimentacoesFiltradas.length > 0;
@@ -268,7 +333,9 @@
 
                   <!-- NOME -->
                   <td class="movement-name">
+
                     {{ movimentacao.nome }}
+
                   </td>
 
                   <!-- TIPO -->
@@ -287,7 +354,7 @@
 
                   </td>
 
-                  <!-- VALOR -->
+                  <!-- VALOR EM USD -->
                   <td
                     class="movement-value"
                     [ngClass]="movimentacao.tipo"
@@ -305,7 +372,9 @@
 
                   <!-- DATA E HORA -->
                   <td class="movement-date">
+
                     {{ formatarData(movimentacao.dataHora) }}
+
                   </td>
 
                 </tr>
@@ -314,10 +383,14 @@
 
             </ng-container>
 
+            <!-- ================================= -->
             <!-- CARREGANDO TABELA -->
+            <!-- ================================= -->
+
             <ng-template #carregandoTabela>
 
               <tr>
+
                 <td colspan="4" class="empty-state">
 
                   <strong>
@@ -325,14 +398,19 @@
                   </strong>
 
                 </td>
+
               </tr>
 
             </ng-template>
 
+            <!-- ================================= -->
             <!-- NENHUM REGISTRO -->
+            <!-- ================================= -->
+
             <ng-template #listaVazia>
 
               <tr>
+
                 <td colspan="4" class="empty-state">
 
                   <strong>
@@ -340,11 +418,12 @@
                   </strong>
 
                   <p>
-                    Cadastre entradas e saídas ou
-                    altere os filtros da pesquisa.
+                    Cadastre entradas e saídas
+                    ou altere os filtros da pesquisa.
                   </p>
 
                 </td>
+
               </tr>
 
             </ng-template>
@@ -358,18 +437,21 @@
     </section>
 
     <!-- ================================= -->
-    <!-- RODAPÉ -->
+    <!-- RODAPE -->
     <!-- ================================= -->
 
     <footer class="list-footer">
 
       <span>
-        Exibindo {{ movimentacoesFiltradas.length }}
-        de {{ movimentacoes.length }} movimentações
+        Exibindo
+        {{ movimentacoesFiltradas.length }}
+        de
+        {{ movimentacoes.length }}
+        movimentações
       </span>
 
       <span>
-        Role a tabela para visualizar mais registros
+        Todos os valores apresentados em USD
       </span>
 
     </footer>

@@ -3,29 +3,35 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-// =====================================
-// MODELO DE ENTRADA
-// =====================================
+// MOEDAS DISPONIVEIS
+export type Moeda = 'BRL' | 'PYG' | 'USD';
 
+// TIPOS DE COTACAO
+export type OrigemCotacao =
+  'AUTOMATICA' | 'MANUAL' | 'MIGRACAO';
+
+// DADOS RECEBIDOS DO BACKEND
 export interface Entrada {
   id: number;
   nomeEntrada: string;
-  valor: number;
   dataHora: string;
+  valor: number;
+
+  moedaOriginal: Moeda;
+  cotacaoPorUsd: number;
+  valorUsd: number;
+  origemCotacao: OrigemCotacao;
+  dataCotacao: string | null;
 }
 
-// =====================================
-// DADOS PARA CADASTRAR E EDITAR
-// =====================================
-
+// DADOS ENVIADOS PARA CADASTRAR OU EDITAR
 export interface EntradaPayload {
   nomeEntrada: string;
   valor: number;
+  moedaOriginal: Moeda;
+  origemCotacao: 'AUTOMATICA' | 'MANUAL';
+  cotacaoPorUsd?: number;
 }
-
-// =====================================
-// SERVICE DE ENTRADAS
-// =====================================
 
 @Injectable({
   providedIn: 'root'
@@ -34,23 +40,17 @@ export class EntradasService {
 
   private http = inject(HttpClient);
 
-  // ENDEREÇO DO BACKEND
-  private readonly API = 'http://localhost:8080/api/entradas';
+  private readonly API =
+    'http://localhost:8080/api/entradas';
 
-  // =====================================
-  // LISTAR TODAS AS ENTRADAS
-  // =====================================
-
+  // LISTAR
   findAll(): Observable<Entrada[]> {
     return this.http.get<Entrada[]>(
       `${this.API}/findAll`
     );
   }
 
-  // =====================================
-  // CADASTRAR ENTRADA
-  // =====================================
-
+  // CADASTRAR
   save(entrada: EntradaPayload): Observable<string> {
     return this.http.post(
       `${this.API}/save`,
@@ -59,10 +59,7 @@ export class EntradasService {
     );
   }
 
-  // =====================================
-  // EDITAR ENTRADA
-  // =====================================
-
+  // EDITAR
   updateById(
     id: number,
     entrada: EntradaPayload
@@ -75,10 +72,7 @@ export class EntradasService {
     );
   }
 
-  // =====================================
-  // EXCLUIR ENTRADA
-  // =====================================
-
+  // EXCLUIR
   deleteById(id: number): Observable<string> {
     return this.http.delete(
       `${this.API}/deleteById/${id}`,

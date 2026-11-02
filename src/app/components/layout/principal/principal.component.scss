@@ -1,20 +1,211 @@
 
 :host {
   display: block;
-  min-height: 100vh;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
 }
+
+* {
+  box-sizing: border-box;
+}
+
+// =====================================
+// ESTRUTURA PRINCIPAL
+// =====================================
 
 .app-layout {
   display: flex;
-  min-height: 100vh;
+
   width: 100%;
+  height: 100vh;
+  height: 100dvh;
+
+  overflow: hidden;
+
+  background: #f7f8fc;
 }
+
+// =====================================
+// AREA AO LADO DA SIDEBAR
+// =====================================
+
+.app-workspace {
+  display: flex;
+  flex-direction: column;
+
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+
+  height: 100%;
+  overflow: hidden;
+}
+
+// =====================================
+// BARRA SUPERIOR
+// MESMA COR DA SIDEBAR
+// =====================================
+
+.principal-topbar {
+  position: relative;
+  z-index: 100;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  width: 100%;
+  height: 70px;
+  min-height: 70px;
+
+  padding: 0 32px;
+
+  background: #302c70;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+
+  color: #ffffff;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+// =====================================
+// ESPACO LIVRE
+// =====================================
+
+.topbar-spacer {
+  flex: 1;
+}
+
+// =====================================
+// PERFIL DO USUARIO
+// APENAS VISUAL, SEM CLIQUES
+// =====================================
+
+.user-profile {
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+
+  min-width: 0;
+  max-width: 100%;
+}
+
+// =====================================
+// ICONE DO USUARIO
+// =====================================
+
+.user-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+
+  border-radius: 50%;
+
+  background: #4b468f;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+
+  color: #ffffff;
+
+  svg {
+    width: 22px;
+    height: 22px;
+  }
+}
+
+// =====================================
+// NOME E MENSAGEM
+// =====================================
+
+.user-information {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+
+  gap: 4px;
+  min-width: 0;
+}
+
+.user-name {
+  display: block;
+
+  max-width: 100%;
+
+  color: #ffffff;
+
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.2;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.welcome-message {
+  display: block;
+
+  color: #c4bfe4;
+
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+// =====================================
+// CONTEUDO DAS PAGINAS
+// =====================================
 
 .app-content {
   flex: 1;
+
   min-width: 0;
-  min-height: 100vh;
+  min-height: 0;
 
   background: #f7f8fc;
+
   overflow-x: hidden;
+  overflow-y: auto;
+}
+
+// =====================================
+// RESPONSIVIDADE
+// =====================================
+
+@media (max-width: 700px) {
+
+  .principal-topbar {
+    height: 64px;
+    min-height: 64px;
+
+    padding: 0 16px;
+  }
+
+  .user-profile {
+    gap: 9px;
+  }
+
+  .user-avatar {
+    width: 35px;
+    height: 35px;
+    flex-basis: 35px;
+
+    svg {
+      width: 19px;
+      height: 19px;
+    }
+  }
+
+  .user-name {
+    font-size: 12px;
+  }
+
+  .welcome-message {
+    font-size: 10px;
+  }
 }

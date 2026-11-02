@@ -821,3 +821,25 @@ tbody td {
     cursor: pointer;
   }
 }
+
+
+
+// =====================================
+// VALOR ORIGINAL E VALOR EM DOLAR
+// =====================================
+
+.entry-value {
+
+  .entry-original {
+    color: #cf5862;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .entry-usd {
+    margin-top: 6px;
+    color: #6355d9;
+    font-size: 12px;
+    font-weight: 600;
+  }
+}

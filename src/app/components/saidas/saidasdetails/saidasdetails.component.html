@@ -1,23 +1,39 @@
+
 <div class="details-page" [class.modal-mode]="emModal">
-  <!-- CABEÇALHO DE PÁGINA: ESCONDIDO DENTRO DO MODAL -->
+
+  <!-- CABECALHO DA PAGINA -->
   <header class="topbar" *ngIf="!emModal">
     <div class="breadcrumb">
-      <span>Financeiro</span><span class="separator">›</span>
-      <a routerLink="/otc/saidas">Saídas</a>
+      <span>Financeiro</span>
       <span class="separator">›</span>
-      <strong>{{ modoEdicao ? 'Editar saída' : 'Nova saída' }}</strong>
+
+      <a routerLink="/otc/saidas">Saídas</a>
+
+      <span class="separator">›</span>
+
+      <strong>
+        {{ modoEdicao ? 'Editar saída' : 'Nova saída' }}
+      </strong>
     </div>
   </header>
 
   <main class="page-content">
-    <a *ngIf="!emModal" routerLink="/otc/saidas" class="back-link">
-      <span aria-hidden="true">←</span> Voltar para saidas
+
+    <a
+      *ngIf="!emModal"
+      routerLink="/otc/saidas"
+      class="back-link"
+    >
+      <span aria-hidden="true">←</span>
+      Voltar para saídas
     </a>
 
     <div class="page-heading">
+
       <h1 id="titulo-saida-modal">
         {{ modoEdicao ? 'Editar saída' : 'Nova saída' }}
       </h1>
+
       <p>
         {{ modoEdicao
           ? 'Atualize as informações da saída selecionada.'
@@ -26,59 +42,289 @@
       </p>
     </div>
 
-    <!-- X DO MODAL -->
-    <button *ngIf="emModal" type="button" class="modal-close"
-            aria-label="Fechar formulário" (click)="cancelar()">×</button>
+    <!-- FECHAR MODAL -->
+    <button
+      *ngIf="emModal"
+      type="button"
+      class="modal-close"
+      aria-label="Fechar formulário"
+      (click)="cancelar()"
+    >
+      ×
+    </button>
 
     <section class="form-card">
+
       <div class="card-heading">
-        <div class="heading-icon"><span>−</span></div>
+
+        <div class="heading-icon">
+          <span>−</span>
+        </div>
+
         <div>
           <h2>Informações da saída</h2>
           <p>Preencha os campos abaixo.</p>
         </div>
       </div>
 
-      <form class="saída-form" (ngSubmit)="salvar()">
+      <form class="saida-form" (ngSubmit)="salvar()">
+
+        <!-- NOME DA SAIDA -->
         <div class="form-group">
-          <label for="nomeSaida">Nome da saída <span class="required">*</span></label>
-          <input id="nomeSaida" name="nomeSaida" type="text" required
-                 placeholder="Ex.: Aluguel, supermercado, energia..."
-                 maxlength="255" autocomplete="off" [(ngModel)]="nomeSaida" />
-          <small>Informe uma descrição para identificar a despesa.</small>
+
+          <label for="nomeSaida">
+            Nome da saída
+            <span class="required">*</span>
+          </label>
+
+          <input
+            id="nomeSaida"
+            name="nomeSaida"
+            type="text"
+            required
+            maxlength="255"
+            autocomplete="off"
+            placeholder="Ex.: Aluguel, supermercado, energia..."
+            [(ngModel)]="nomeSaida"
+          />
+
+          <small>
+            Informe uma descrição para identificar a despesa.
+          </small>
         </div>
 
+        <!-- MOEDA -->
         <div class="form-group">
-          <label for="valor">Valor da saída <span class="required">*</span></label>
+
+          <label for="moedaOriginal">
+            Moeda
+            <span class="required">*</span>
+          </label>
+
+          <select
+            id="moedaOriginal"
+            name="moedaOriginal"
+            class="currency-select"
+            [(ngModel)]="moedaOriginal"
+            (ngModelChange)="alterarMoeda()"
+          >
+            <option value="BRL">
+              Real brasileiro (BRL)
+            </option>
+
+            <option value="PYG">
+              Guarani paraguaio (PYG)
+            </option>
+
+            <option value="USD">
+              Dólar americano (USD)
+            </option>
+          </select>
+        </div>
+
+        <!-- VALOR ORIGINAL -->
+        <div class="form-group">
+
+          <label for="valor">
+            Valor da saída
+            <span class="required">*</span>
+          </label>
+
           <div class="value-input">
-            <span class="currency-prefix">R$</span>
-            <input id="valor" name="valor" type="number" required min="0.01"
-                   step="0.01" placeholder="0,00" [(ngModel)]="valor" />
+
+            <span class="currency-prefix">
+              {{ simboloMoeda }}
+            </span>
+
+            <input
+              id="valor"
+              name="valor"
+              type="number"
+              required
+              [min]="moedaOriginal === 'PYG' ? 1 : 0.01"
+              [step]="moedaOriginal === 'PYG' ? 1 : 0.01"
+              placeholder="Digite o valor"
+              [(ngModel)]="valor"
+            />
           </div>
-          <small>Informe um valor maior que zero, com até duas casas decimais.</small>
+
+          <small>
+            Informe o valor na moeda selecionada.
+          </small>
         </div>
 
+        <!-- COTACAO PARA BRL E PYG -->
+        <ng-container *ngIf="moedaOriginal !== 'USD'">
+
+          <div class="form-group">
+
+            <label for="origemCotacao">
+              Tipo de cotação
+              <span class="required">*</span>
+            </label>
+
+            <select
+              id="origemCotacao"
+              name="origemCotacao"
+              class="currency-select"
+              [(ngModel)]="origemCotacao"
+              (ngModelChange)="alterarOrigemCotacao()"
+            >
+              <option value="AUTOMATICA">
+                Cotação padrão
+              </option>
+
+              <option value="MANUAL">
+                Informar cotação manual
+              </option>
+            </select>
+          </div>
+
+          <!-- COTACAO PADRAO -->
+          <div
+            class="quote-info"
+            *ngIf="origemCotacao === 'AUTOMATICA'"
+          >
+            <span class="quote-label">
+              Cotação padrão provisória
+            </span>
+
+            <strong>
+              1 USD =
+              {{ formatarCotacao(cotacaoAplicada!) }}
+              {{ moedaOriginal }}
+            </strong>
+          </div>
+
+          <!-- COTACAO MANUAL -->
+          <div
+            class="form-group"
+            *ngIf="origemCotacao === 'MANUAL'"
+          >
+
+            <label for="cotacaoManual">
+              Cotação manual
+              <span class="required">*</span>
+            </label>
+
+            <input
+              id="cotacaoManual"
+              name="cotacaoManual"
+              type="number"
+              required
+              min="0.00000001"
+              step="0.00000001"
+              placeholder="Informe a cotação"
+              [(ngModel)]="cotacaoManual"
+            />
+
+            <small>
+              Quantos {{ moedaOriginal }}
+              equivalem a 1 USD?
+            </small>
+          </div>
+
+          <!-- PREVIA DA CONVERSAO -->
+          <div class="conversion-preview">
+
+            <span class="preview-label">
+              Valor estimado em dólar
+            </span>
+
+            <strong class="preview-value">
+              {{
+                valorConvertidoUSD !== null
+                  ? formatarUSD(valorConvertidoUSD)
+                  : '—'
+              }}
+            </strong>
+
+            <small>
+              O valor definitivo será calculado
+              pelo servidor ao salvar.
+            </small>
+          </div>
+
+        </ng-container>
+
+        <!-- QUANDO JA ESTA EM USD -->
+        <div
+          class="quote-info"
+          *ngIf="moedaOriginal === 'USD'"
+        >
+
+          <span class="quote-label">
+            Moeda selecionada
+          </span>
+
+          <strong>
+            O valor já está em dólar.
+          </strong>
+        </div>
+
+        <!-- INFORMACAO DE DATA E HORA -->
         <div class="info-box">
-          <span class="info-icon">i</span>
-          <p>A data e a hora são registradas automaticamente no cadastro e não
-             podem ser alteradas na edição.</p>
+
+          <span class="info-icon">
+            i
+          </span>
+
+          <p>
+            A data e a hora são registradas
+            automaticamente no cadastro e não
+            podem ser alteradas na edição.
+          </p>
         </div>
 
-        <div class="error-message" *ngIf="mensagemErro" role="alert">
+        <!-- MENSAGEM DE ERRO -->
+        <div
+          class="error-message"
+          *ngIf="mensagemErro"
+          role="alert"
+        >
           {{ mensagemErro }}
         </div>
 
+        <!-- BOTOES -->
         <div class="form-actions">
-          <button *ngIf="emModal" type="button" class="cancel-button"
-                  (click)="cancelar()">Cancelar</button>
-          <a *ngIf="!emModal" routerLink="/otc/saidas" class="cancel-button">
+
+          <button
+            *ngIf="emModal"
+            type="button"
+            class="cancel-button"
+            (click)="cancelar()"
+          >
+            Cancelar
+          </button>
+
+          <a
+            *ngIf="!emModal"
+            routerLink="/otc/saidas"
+            class="cancel-button"
+          >
             Cancelar
           </a>
-          <button type="submit" class="save-button" [disabled]="salvando">
-            {{ modoEdicao ? 'Salvar alterações' : 'Salvar saída' }}
+
+          <button
+            type="submit"
+            class="save-button"
+            [disabled]="salvando"
+          >
+            {{
+              salvando
+                ? 'Salvando...'
+                : modoEdicao
+                  ? 'Salvar alterações'
+                  : 'Salvar saída'
+            }}
           </button>
+
         </div>
+
       </form>
+
     </section>
+
   </main>
+
 </div>
