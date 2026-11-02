@@ -1,445 +1,157 @@
-
 <div class="inicio-page">
 
-  <!-- ===================================== -->
-  <!-- TITULO DA VISAO GERAL -->
-  <!-- ===================================== -->
+  <!-- CABECALHO DA VISAO GERAL -->
+  <header class="dashboard-heading">
+    <span class="section-eyebrow">PAINEL FINANCEIRO</span>
+    <h1>Visão geral</h1>
+    <p>Acompanhe seu saldo em caixa, as cotações e as contas a pagar e receber.</p>
+  </header>
 
-  <section class="dashboard-heading">
+  <!-- LINHA SUPERIOR: SOMENTE CAIXA E COTACOES -->
+  <section class="top-grid" aria-label="Resumo financeiro">
 
-    <div>
-      <span class="section-eyebrow">
-        PAINEL FINANCEIRO
-      </span>
-
-      <h1>Visão geral</h1>
-
-      <p>
-        Acompanhe seus saldos, cotações
-        e próximas contas a pagar.
-      </p>
-    </div>
-
-  </section>
-
-  <!-- ===================================== -->
-  <!-- CARDS PRINCIPAIS -->
-  <!-- ===================================== -->
-
-  <section class="balances-grid">
-
-    <!-- ===================================== -->
-    <!-- SALDO EM CAIXA -->
-    <!-- ===================================== -->
-
-    <article class="balance-card cash-card">
-
-      <div class="balance-card-top">
-
-        <div class="balance-icon cash-icon">
-
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.8"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            aria-hidden="true"
-          >
+    <article class="cash-card">
+      <div class="card-heading">
+        <div class="card-icon cash-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <rect x="3" y="7" width="18" height="14" rx="3"/>
-            <path d="M3 11h18"/>
-            <path d="M16 16h2"/>
-            <path d="M6 7V5a2 2 0 0 1 2-2h10"/>
+            <path d="M3 11h18M16 16h2M6 7V5a2 2 0 0 1 2-2h10"/>
           </svg>
-
         </div>
-
-        <div class="balance-heading">
-
+        <div class="card-label">
           <h2>Saldo em caixa</h2>
-
-          <span class="status-connected">
-            <span class="status-dot"></span>
-            Conectado ao Extrato
-          </span>
-
+          <span class="connected"><span class="status-dot"></span> Conectado ao Extrato</span>
         </div>
-
-        <!-- BOTAO PARA ATUALIZAR O SALDO -->
-        <button
-          type="button"
-          class="refresh-button"
-          aria-label="Atualizar saldo em caixa"
-          title="Atualizar saldo"
-          [disabled]="carregandoSaldo"
-          (click)="carregarSaldo()"
-        >
-
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.8"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            aria-hidden="true"
-          >
-            <path d="M20 7v5h-5"/>
-            <path d="M4 17v-5h5"/>
-            <path d="M6 9a7 7 0 0 1 12-2l2 5"/>
-            <path d="M18 15a7 7 0 0 1-12 2l-2-5"/>
+        <button class="refresh-button" type="button" (click)="carregarSaldo()"
+          [disabled]="carregandoSaldo" aria-label="Atualizar saldo" title="Atualizar saldo">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+            <path d="M20 7v5h-5M4 17v-5h5M6 9a7 7 0 0 1 12-2l2 5M18 15a7 7 0 0 1-12 2l-2-5"/>
           </svg>
-
         </button>
-
       </div>
-
-      <div class="balance-card-content">
-
-        <strong
-          class="balance-value"
-          [class.negative]="
-            saldoCaixa !== null && saldoCaixa < 0
-          "
-        >
-          {{
-            carregandoSaldo
-              ? 'Carregando...'
-              : saldoCaixa === null
-                ? 'Indisponível'
-                : formatarUSD(saldoCaixa)
-          }}
+      <div class="cash-bottom">
+        <strong class="cash-value" [class.negative]="saldoCaixa !== null && saldoCaixa < 0">
+          {{ carregandoSaldo ? 'Carregando...' : saldoCaixa === null ? 'Indisponível' : formatarUSD(saldoCaixa) }}
         </strong>
-
-        <p class="balance-description">
-          Saldo atual calculado pelas entradas e saídas.
-        </p>
-
-        <small
-          class="balance-error"
-          *ngIf="erroSaldo"
-          role="alert"
-        >
-          {{ erroSaldo }}
-        </small>
-
+        <p>Saldo atual calculado pelas entradas e saídas.</p>
+        <small class="error" *ngIf="erroSaldo" role="alert">{{ erroSaldo }}</small>
       </div>
-
     </article>
 
-    <!-- ===================================== -->
-    <!-- SALDO BANCARIO -->
-    <!-- ===================================== -->
-
-    <article class="balance-card bank-card">
-
-      <div class="balance-card-top">
-
-        <div class="balance-icon bank-icon">
-
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.8"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            aria-hidden="true"
-          >
-            <path d="M3 10h18"/>
-            <path d="M5 10v9"/>
-            <path d="M10 10v9"/>
-            <path d="M14 10v9"/>
-            <path d="M19 10v9"/>
-            <path d="M2 21h20"/>
-            <path d="M2 10l10-7 10 7"/>
+    <article class="exchange-card">
+      <div class="card-heading">
+        <div class="card-icon exchange-header-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>
           </svg>
-
         </div>
-
-        <div class="balance-heading">
-          <h2>Saldo bancário</h2>
-          <span class="status-pending">
-            Integração pendente
-          </span>
+        <div class="card-label">
+          <h2>Cotações de câmbio</h2>
+          <span class="exchange-caption">Valores de referência · Configuração provisória</span>
         </div>
-
       </div>
-
-      <div class="balance-card-content">
-
-        <strong class="balance-value placeholder-value">
-          API pendente
-        </strong>
-
-        <p class="balance-description">
-          Falta conectar a API bancária para
-          consultar o saldo.
-        </p>
-
-      </div>
-
-    </article>
-
-    <!-- ===================================== -->
-    <!-- SALDO TOTAL REAL -->
-    <!-- ===================================== -->
-
-    <article class="balance-card total-card">
-
-      <div class="balance-card-top">
-
-        <div class="balance-icon total-icon">
-
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.8"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            aria-hidden="true"
-          >
-            <rect x="3" y="6" width="18" height="15" rx="3"/>
-            <path d="M3 10h18"/>
-            <path d="M7 6V4a2 2 0 0 1 2-2h9"/>
-            <circle cx="16.5" cy="15.5" r="2"/>
-          </svg>
-
+      <div class="exchange-values">
+        <div class="exchange-item">
+          <div class="card-icon exchange-small-icon"><span>$</span></div>
+          <div>
+            <span class="exchange-name">Cotação USD × BRL</span>
+            <strong>{{ formatarBRL(cotacaoBrlPorUsd) }}</strong>
+            <small>1 dólar americano</small>
+          </div>
         </div>
-
-        <div class="balance-heading">
-          <h2>Saldo total real</h2>
-          <span class="status-pending">
-            Integração pendente
-          </span>
+        <div class="exchange-item">
+          <div class="card-icon exchange-small-icon"><span>₲</span></div>
+          <div>
+            <span class="exchange-name">Cotação USD × PYG</span>
+            <strong>{{ formatarPYG(cotacaoPygPorUsd) }}</strong>
+            <small>1 dólar americano</small>
+          </div>
         </div>
-
       </div>
-
-      <div class="balance-card-content">
-
-        <strong class="balance-value placeholder-value">
-          API pendente
-        </strong>
-
-        <p class="balance-description">
-          Falta integrar os dados necessários
-          para calcular o saldo total real.
-        </p>
-
-      </div>
-
     </article>
 
   </section>
 
-  <!-- ===================================== -->
-  <!-- COTACOES -->
-  <!-- ===================================== -->
+  <!-- DUAS AGENDAS, LADO A LADO -->
+  <section class="agenda-grid" aria-label="Proximas contas">
 
-  <section class="exchange-section">
-
-    <div class="exchange-item">
-
-      <div class="exchange-icon usd-icon">
-        <span>$</span>
-      </div>
-
-      <div class="exchange-information">
-
-        <span class="exchange-label">
-          Cotação USD × BRL
-        </span>
-
-        <strong class="exchange-value">
-          {{ formatarBRL(cotacaoBrlPorUsd) }}
-        </strong>
-
-        <small>
-          1 dólar americano
-        </small>
-
-      </div>
-
-    </div>
-
-    <div class="exchange-item">
-
-      <div class="exchange-icon pyg-icon">
-        <span>₲</span>
-      </div>
-
-      <div class="exchange-information">
-
-        <span class="exchange-label">
-          Cotação USD × PYG
-        </span>
-
-        <strong class="exchange-value">
-          {{ formatarPYG(cotacaoPygPorUsd) }}
-        </strong>
-
-        <small>
-          1 dólar americano
-        </small>
-
-      </div>
-
-    </div>
-
-    <div class="exchange-item exchange-status">
-
-      <div class="exchange-icon clock-icon">
-
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.8"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          aria-hidden="true"
-        >
-          <circle cx="12" cy="12" r="9"/>
-          <path d="M12 7v5l3 2"/>
-        </svg>
-
-      </div>
-
-      <div class="exchange-information">
-
-        <span class="exchange-label">
-          Fonte das cotações
-        </span>
-
-        <strong class="exchange-value exchange-status-value">
-          Valores de referência
-        </strong>
-
-        <small>
-          Configuração provisória, sem atualização ao vivo
-        </small>
-
-      </div>
-
-    </div>
-
-  </section>
-
-  <!-- ===================================== -->
-  <!-- PROXIMAS CONTAS A PAGAR -->
-  <!-- ===================================== -->
-
-  <section class="bills-section">
-
-    <div class="bills-heading">
-
-      <div class="bills-heading-left">
-
-        <div class="bills-icon">
-
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.8"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            aria-hidden="true"
-          >
-            <rect x="5" y="3" width="14" height="18" rx="2"/>
-            <path d="M9 3.5h6"/>
-            <path d="M9 9h6"/>
-            <path d="M9 13h6"/>
-            <path d="M9 17h4"/>
-          </svg>
-
+    <!-- CONTAS A PAGAR -->
+    <article class="agenda-card">
+      <div class="agenda-card-heading">
+        <div class="heading-left">
+          <div class="agenda-icon pagar-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 9h6M9 13h6M9 17h4"/>
+            </svg>
+          </div>
+          <div><h2>Próximas contas a pagar</h2><p>Pendentes nos próximos 7 dias.</p></div>
         </div>
-
-        <div>
-          <h2>Próximas contas a pagar</h2>
-
-          <p>
-            Demonstração visual com contas fictícias.
-          </p>
-        </div>
-
+        <a routerLink="/otc/pagar" class="view-all">Ver agenda</a>
       </div>
 
-      <span class="sample-badge">
-        Dados demonstrativos
-      </span>
+      <div *ngIf="carregandoPagar" class="load-message" role="status">Carregando contas a pagar...</div>
+      <div *ngIf="erroPagar" class="load-message error" role="alert">
+        {{ erroPagar }}
+        <button type="button" (click)="carregarAgenda('PAGAR')">Tentar novamente</button>
+      </div>
 
-    </div>
+      <div class="table-scroll" *ngIf="!carregandoPagar && !erroPagar">
+        <table>
+          <thead><tr><th>Vencimento</th><th>Descrição</th><th>Valor</th><th>Alerta</th></tr></thead>
+          <tbody>
+            <tr *ngFor="let conta of proximasPagar; trackBy: identificarConta">
+              <td class="date-cell">{{ formatarData(conta.dataHora) }}</td>
+              <td class="name-cell">{{ conta.nome }}</td>
+              <td class="money-cell">{{ formatarMoeda(conta.valor, conta.moeda) }}</td>
+              <td><span class="alert-pill" [ngClass]="alerta(conta) === 'Hoje' ? 'today' : alerta(conta) === 'Amanhã' ? 'tomorrow' : 'upcoming'">{{ alerta(conta) }}</span></td>
+            </tr>
+            <tr *ngIf="proximasPagar.length === 0">
+              <td colspan="4" class="empty-state">Nenhuma conta pendente para os próximos 7 dias.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <footer class="agenda-footer">{{ proximasPagar.length }} conta(s) pendente(s) no período</footer>
+    </article>
 
-    <!-- TABELA -->
-    <div class="bills-table-wrapper">
+    <!-- CONTAS A RECEBER -->
+    <article class="agenda-card">
+      <div class="agenda-card-heading">
+        <div class="heading-left">
+          <div class="agenda-icon receber-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 20V4M5 11l7-7 7 7M5 21h14"/>
+            </svg>
+          </div>
+          <div><h2>Próximas contas a receber</h2><p>Pendentes nos próximos 7 dias.</p></div>
+        </div>
+        <a routerLink="/otc/receber" class="view-all">Ver agenda</a>
+      </div>
 
-      <table class="bills-table">
+      <div *ngIf="carregandoReceber" class="load-message" role="status">Carregando contas a receber...</div>
+      <div *ngIf="erroReceber" class="load-message error" role="alert">
+        {{ erroReceber }}
+        <button type="button" (click)="carregarAgenda('RECEBER')">Tentar novamente</button>
+      </div>
 
-        <thead>
-          <tr>
-            <th>Vencimento</th>
-            <th>Descrição</th>
-            <th>Fornecedor</th>
-            <th>Valor</th>
-            <th>Situação</th>
-          </tr>
-        </thead>
-
-        <tbody>
-
-          <tr *ngFor="let conta of contasExemplo">
-
-            <td class="bill-date">
-              {{ formatarData(conta.vencimento) }}
-            </td>
-
-            <td class="bill-name">
-              {{ conta.descricao }}
-            </td>
-
-            <td class="bill-supplier">
-              {{ conta.fornecedor }}
-            </td>
-
-            <td class="bill-amount">
-              {{ formatarBRL(conta.valor) }}
-            </td>
-
-            <td>
-              <span
-                class="bill-status"
-                [class.upcoming]="
-                  conta.situacao === 'Próxima'
-                "
-              >
-                {{ conta.situacao }}
-              </span>
-            </td>
-
-          </tr>
-
-        </tbody>
-
-      </table>
-
-    </div>
-
-    <div class="bills-footer">
-
-      <span>
-        Exibindo {{ contasExemplo.length }}
-        contas de exemplo
-      </span>
-
-      <span>
-        Nenhuma cobrança real foi consultada.
-      </span>
-
-    </div>
+      <div class="table-scroll" *ngIf="!carregandoReceber && !erroReceber">
+        <table>
+          <thead><tr><th>Vencimento</th><th>Descrição</th><th>Valor</th><th>Alerta</th></tr></thead>
+          <tbody>
+            <tr *ngFor="let conta of proximasReceber; trackBy: identificarConta">
+              <td class="date-cell">{{ formatarData(conta.dataHora) }}</td>
+              <td class="name-cell">{{ conta.nome }}</td>
+              <td class="money-cell">{{ formatarMoeda(conta.valor, conta.moeda) }}</td>
+              <td><span class="alert-pill" [ngClass]="alerta(conta) === 'Hoje' ? 'today' : alerta(conta) === 'Amanhã' ? 'tomorrow' : 'upcoming'">{{ alerta(conta) }}</span></td>
+            </tr>
+            <tr *ngIf="proximasReceber.length === 0">
+              <td colspan="4" class="empty-state">Nenhum recebimento pendente para os próximos 7 dias.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <footer class="agenda-footer">{{ proximasReceber.length }} conta(s) pendente(s) no período</footer>
+    </article>
 
   </section>
 

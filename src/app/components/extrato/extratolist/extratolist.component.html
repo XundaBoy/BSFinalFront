@@ -263,7 +263,115 @@
           Limpar filtros
         </button>
 
+        <!-- NOVO: EXPORTAR EXTRATO DO MES -->
+        <button
+          type="button"
+          class="export-button"
+          [disabled]="carregando || !entradasDisponiveis || !saidasDisponiveis"
+          (click)="abrirExportacao()"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
+               aria-hidden="true">
+            <path d="M12 3v12M7 10l5 5 5-5"/>
+            <path d="M4 17v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/>
+          </svg>
+          Exportar extrato
+        </button>
+
       </div>
+
+    </section>
+
+    <!-- ================================= -->
+    <!-- RESUMO DO MES SELECIONADO -->
+    <!-- O SALDO ACUMULADO ORIGINAL CONTINUA ACIMA -->
+    <!-- ================================= -->
+
+    <section class="period-section" *ngIf="filtroMes">
+
+      <div class="period-heading">
+        <div>
+          <span class="period-eyebrow">PERÍODO SELECIONADO</span>
+          <h2>{{ mesSelecionadoPorExtenso }}</h2>
+          <p>De {{ intervaloMesSelecionado }} · Valores em USD</p>
+        </div>
+
+        <span class="period-tag">Resumo mensal</span>
+      </div>
+
+      <ng-container *ngIf="resumoMensal as resumo; else resumoIndisponivel">
+
+        <div class="period-grid">
+          <article class="period-card anterior">
+            <div class="period-card-title">
+              <span>Saldo anterior</span>
+              <span class="period-icon">◈</span>
+            </div>
+            <strong [class.valor-negativo]="resumo.saldoAnterior < 0">
+              {{ formatarMoeda(resumo.saldoAnterior) }}
+            </strong>
+            <small>Saldo até o último dia do mês anterior</small>
+          </article>
+
+          <article class="period-card period-entradas">
+            <div class="period-card-title">
+              <span>Entradas no mês</span>
+              <span class="period-icon">↗</span>
+            </div>
+            <strong>+ {{ formatarMoeda(resumo.entradasPeriodo) }}</strong>
+            <small>Somente movimentações deste mês</small>
+          </article>
+
+          <article class="period-card period-saidas">
+            <div class="period-card-title">
+              <span>Saídas no mês</span>
+              <span class="period-icon">↘</span>
+            </div>
+            <strong>− {{ formatarMoeda(resumo.saidasPeriodo) }}</strong>
+            <small>Somente movimentações deste mês</small>
+          </article>
+
+          <article class="period-card final">
+            <div class="period-card-title">
+              <span>Saldo ao fim do mês</span>
+              <span class="period-icon">✓</span>
+            </div>
+            <strong [class.valor-negativo]="resumo.saldoFinal < 0">
+              {{ formatarMoeda(resumo.saldoFinal) }}
+            </strong>
+            <small>Saldo anterior + entradas − saídas</small>
+          </article>
+        </div>
+
+        <div class="period-details">
+          <div>
+            <span>Movimentações no mês</span>
+            <strong>{{ resumo.quantidade }} registros</strong>
+          </div>
+          <div>
+            <span>Maior entrada</span>
+            <strong>{{ formatarMoeda(resumo.maiorEntrada) }}</strong>
+          </div>
+          <div>
+            <span>Maior saída</span>
+            <strong>{{ formatarMoeda(resumo.maiorSaida) }}</strong>
+          </div>
+        </div>
+
+        <p class="period-note">
+          Os valores do resumo consideram todas as entradas e saídas do mês.
+          Os filtros de nome e tipo afetam somente a tabela abaixo.
+        </p>
+
+      </ng-container>
+
+      <ng-template #resumoIndisponivel>
+        <p class="period-unavailable" *ngIf="!carregando">
+          Não foi possível calcular o resumo mensal.
+          Confira se as entradas e saídas foram carregadas e se todos os registros possuem data.
+        </p>
+      </ng-template>
 
     </section>
 
@@ -458,4 +566,73 @@
 
   </main>
 
+</div>
+
+<!-- ===================================== -->
+<!-- MODAL DE EXPORTACAO EM PDF           -->
+<!-- ===================================== -->
+<div
+  *ngIf="modalExportacaoAberto"
+  class="export-overlay"
+  (click)="fecharExportacao()"
+>
+  <div
+    class="export-dialog"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="export-title"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="export-dialog-heading">
+      <div class="export-dialog-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"
+             aria-hidden="true">
+          <path d="M8 3h8l4 4v14H4V3h4"/>
+          <path d="M16 3v5h4M8 12h8M8 16h8"/>
+        </svg>
+      </div>
+      <div>
+        <h2 id="export-title">Exportar extrato</h2>
+        <p>Escolha o mês para gerar o relatório em PDF.</p>
+      </div>
+      <button
+        type="button"
+        class="export-close"
+        aria-label="Fechar janela de exportação"
+        [disabled]="exportando"
+        (click)="fecharExportacao()"
+      >×</button>
+    </div>
+
+    <form (ngSubmit)="gerarExportacao()">
+      <label class="export-label" for="mesExportacao">Mês do extrato</label>
+      <input
+        id="mesExportacao"
+        class="export-month"
+        type="month"
+        name="mesExportacao"
+        [(ngModel)]="mesExportacao"
+        [disabled]="exportando"
+        required
+      />
+
+      <p class="export-info">
+        O arquivo incluirá saldo anterior, entradas, saídas, saldo final
+        e todas as movimentações do mês escolhido, em USD.
+      </p>
+      <p class="export-error" role="alert" *ngIf="erroExportacao">
+        {{ erroExportacao }}
+      </p>
+
+      <div class="export-actions">
+        <button type="button" class="export-cancel" (click)="fecharExportacao()"
+                [disabled]="exportando">Cancelar</button>
+        <button type="submit" class="export-submit"
+                [disabled]="exportando || !mesExportacao">
+          {{ exportando ? 'Gerando PDF...' : 'Baixar PDF' }}
+        </button>
+      </div>
+    </form>
+  </div>
 </div>

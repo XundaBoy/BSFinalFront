@@ -1,0 +1,228 @@
+<div class="agenda-page">
+
+  <!-- TITULO: SEM BOTAO NO CANTO SUPERIOR DIREITO -->
+  <header class="page-heading">
+    <span class="eyebrow">AGENDA FINANCEIRA</span>
+    <h1>{{ titulo }}</h1>
+    <p>{{ subtitulo }}</p>
+  </header>
+
+  <!-- 3 CARDS: SOMAS SEPARADAS EM BRL / PYG / USD -->
+  <section class="summary-grid" aria-label="Resumo da agenda">
+    <article class="summary-card pendentes">
+      <div class="summary-top">
+        <div class="summary-icon purple">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+        </div>
+        <h2>Total pendente</h2>
+      </div>
+      <div class="currency-line" *ngFor="let moeda of moedas">
+        <span class="currency-name">{{ moeda }}</span>
+        <strong>{{ formatarMoeda(total('PENDENTE', moeda), moeda) }}</strong>
+      </div>
+    </article>
+
+    <article class="summary-card proximos">
+      <div class="summary-top">
+        <div class="summary-icon blue">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 10h18M8 14h3"/></svg>
+        </div>
+        <h2>Próximos 7 dias</h2>
+      </div>
+      <div class="currency-line" *ngFor="let moeda of moedas">
+        <span class="currency-name">{{ moeda }}</span>
+        <strong>{{ formatarMoeda(total('PROXIMOS', moeda), moeda) }}</strong>
+      </div>
+    </article>
+
+    <article class="summary-card confirmados">
+      <div class="summary-top">
+        <div class="summary-icon green">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg>
+        </div>
+        <h2>Confirmados (últimos 30 dias)</h2>
+      </div>
+      <div class="currency-line" *ngFor="let moeda of moedas">
+        <span class="currency-name">{{ moeda }}</span>
+        <strong>{{ formatarMoeda(total('CONFIRMADO', moeda), moeda) }}</strong>
+      </div>
+    </article>
+  </section>
+
+  <!-- CADASTRO DIRETO NA PAGINA: SOMENTE ADMIN -->
+  <section class="form-card" *ngIf="podeModificar">
+    <div class="section-heading">
+      <div class="section-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3h11l3 3v15H5zM15 3v5h4M9 13h6M12 10v6"/></svg>
+      </div>
+      <div><h2>{{ tituloCadastro }}</h2><p>Informe os dados e salve como pendente.</p></div>
+    </div>
+
+    <form #cadastroForm="ngForm" class="form-grid" (ngSubmit)="salvarCadastro()">
+      <div class="field nome-field">
+        <label for="agenda-nome">Nome</label>
+        <input id="agenda-nome" name="nome" type="text" maxlength="150"
+          required autocomplete="off" placeholder="Ex.: Aluguel, cliente, fornecedor..."
+          [(ngModel)]="cadastro.nome" />
+      </div>
+      <div class="field valor-field">
+        <label for="agenda-valor">Valor</label>
+        <input id="agenda-valor" name="valor" type="number" min="0.01"
+          [step]="cadastro.moeda === 'PYG' ? '1' : '0.01'" required
+          placeholder="0,00" [(ngModel)]="cadastro.valor" />
+      </div>
+      <div class="field moeda-field">
+        <label for="agenda-moeda">Moeda</label>
+        <select id="agenda-moeda" name="moeda" required [(ngModel)]="cadastro.moeda">
+          <option value="BRL">BRL — Real</option>
+          <option value="PYG">PYG — Guarani</option>
+          <option value="USD">USD — Dólar</option>
+        </select>
+      </div>
+      <div class="field data-field">
+        <label for="agenda-data">Data de vencimento</label>
+        <input id="agenda-data" name="dataHora" type="date" required
+          [(ngModel)]="cadastro.dataHora" />
+      </div>
+      <button class="save-button" type="submit"
+        [disabled]="cadastroForm.invalid || salvando">
+        {{ salvando ? 'Salvando...' : 'Salvar' }}
+      </button>
+    </form>
+    <p class="form-hint">A conta será cadastrada como <b>PENDENTE</b>. Nenhum lançamento será feito em Entradas, Saídas ou Extrato.</p>
+  </section>
+
+  <!-- AGENDA / TABELA -->
+  <section class="table-card">
+    <div class="table-heading">
+      <div class="table-heading-title">
+        <div class="section-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 10h18"/></svg>
+        </div>
+        <div><h2>{{ tituloTabela }}</h2><p>{{ contasFiltradas.length }} registro(s) exibido(s)</p></div>
+      </div>
+      <div class="table-filters">
+        <input type="search" aria-label="Buscar por nome" placeholder="Buscar pelo nome"
+          [(ngModel)]="filtroNome" />
+        <select aria-label="Filtrar por status" [(ngModel)]="filtroStatus">
+          <option value="TODOS">Todos os status</option>
+          <option value="PENDENTE">Pendente</option>
+          <option value="CONFIRMADO">Confirmado — últimos 30 dias</option>
+        </select>
+        <button type="button" class="reload-button" (click)="carregar()"
+          [disabled]="carregando" title="Atualizar agenda" aria-label="Atualizar agenda">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5M5.5 9a7 7 0 0 1 12.5-2l2 5M18.5 15A7 7 0 0 1 6 17l-2-5"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="message-info" *ngIf="carregando" role="status">Carregando agenda do banco de dados...</div>
+    <div class="message-error" *ngIf="erroCarregamento" role="alert">
+      {{ erroCarregamento }}
+      <button type="button" (click)="carregar()">Tentar novamente</button>
+    </div>
+    <div class="message-error" *ngIf="erroOperacao && !contaEmEdicao" role="alert">{{ erroOperacao }}</div>
+
+    <div class="table-wrapper" (scroll)="fecharMenu()">
+      <table>
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Valor / Moeda</th>
+            <th>Data</th>
+            <th>Status</th>
+            <th>Alerta</th>
+            <th class="actions-column" *ngIf="podeModificar">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let conta of contasFiltradas; trackBy: identificarConta">
+            <td class="account-name">{{ conta.nome }}</td>
+            <td class="account-value">{{ formatarMoeda(conta.valor, conta.moeda) }}</td>
+            <td class="account-date">{{ formatarData(conta.dataHora) }}</td>
+            <td><span class="status-pill" [class.is-confirmed]="conta.status === 'CONFIRMADO'">{{ conta.status === 'PENDENTE' ? 'Pendente' : 'Confirmado' }}</span></td>
+            <td><span class="alert-pill" [ngClass]="alerta(conta).classe">{{ alerta(conta).texto }}</span></td>
+            <td class="actions-column" *ngIf="podeModificar">
+              <div class="row-actions">
+                <button type="button" class="confirm-button" title="Confirmar conta" aria-label="Confirmar conta"
+                  *ngIf="conta.status === 'PENDENTE'" [disabled]="acaoId !== null"
+                  (click)="confirmar(conta)">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5L20 7"/></svg>
+                </button>
+                <span class="already-confirmed" *ngIf="conta.status === 'CONFIRMADO'" title="Já confirmada">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5L20 7"/></svg>
+                </span>
+                <button type="button" class="more-button" aria-haspopup="menu"
+                  [attr.aria-label]="'Opções de ' + conta.nome"
+                  [attr.aria-expanded]="menuAbertoId === conta.id"
+                  (click)="alternarMenu(conta.id, $event)">
+                  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="!carregando && !erroCarregamento && contasFiltradas.length === 0">
+            <td class="empty-state" [attr.colspan]="podeModificar ? 6 : 5">
+              <div class="empty-icon">⌕</div>
+              <strong>Nenhuma conta encontrada</strong>
+              <p>Cadastre uma conta ou altere os filtros.</p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <footer class="table-footer">Exibindo {{ contasFiltradas.length }} de {{ contas.length }} contas da agenda <span>Sem impacto nos saldos do sistema</span></footer>
+  </section>
+</div>
+
+<!-- DROPDOWN FLUTUANTE COM O MESMO PADRAO DE ENTRADAS -->
+<div *ngIf="contaMenuSelecionada && podeModificar" class="action-dropdown"
+  role="menu" [style.top.px]="menuTop" [style.left.px]="menuLeft"
+  (click)="$event.stopPropagation()">
+  <button type="button" class="dropdown-option" role="menuitem" (click)="abrirEdicao()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L9 17l-4 1 1-4Z"/></svg>
+    Editar
+  </button>
+  <button type="button" class="dropdown-option delete-option" role="menuitem" (click)="excluirSelecionada()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M5 6l1 15h12l1-15M10 11v6M14 11v6"/></svg>
+    Excluir
+  </button>
+</div>
+
+<!-- MODAL PARA EDITAR; NAO ALTERA STATUS OU TIPO -->
+<div class="edit-overlay" *ngIf="contaEmEdicao && podeModificar" (click)="fecharEdicao()">
+  <div class="edit-dialog" role="dialog" aria-modal="true" aria-labelledby="titulo-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div><h2 id="titulo-modal">Editar {{ titulo.toLowerCase() }}</h2><p>O tipo e o status serão preservados.</p></div>
+      <button type="button" class="close-modal" aria-label="Fechar edição" (click)="fecharEdicao()">×</button>
+    </div>
+    <form #edicaoForm="ngForm" class="edit-form" (ngSubmit)="salvarEdicao()">
+      <div class="field">
+        <label for="editar-nome">Nome</label>
+        <input id="editar-nome" name="nomeEdicao" maxlength="150" required [(ngModel)]="edicao.nome" />
+      </div>
+      <div class="modal-row">
+        <div class="field">
+          <label for="editar-valor">Valor</label>
+          <input id="editar-valor" type="number" name="valorEdicao" min="0.01" required
+            [step]="edicao.moeda === 'PYG' ? '1' : '0.01'" [(ngModel)]="edicao.valor" />
+        </div>
+        <div class="field">
+          <label for="editar-moeda">Moeda</label>
+          <select id="editar-moeda" name="moedaEdicao" required [(ngModel)]="edicao.moeda">
+            <option value="BRL">BRL — Real</option><option value="PYG">PYG — Guarani</option><option value="USD">USD — Dólar</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label for="editar-data">Data de vencimento</label>
+        <input id="editar-data" type="date" name="dataEdicao" required [(ngModel)]="edicao.dataHora" />
+      </div>
+      <p *ngIf="erroOperacao" class="message-error" role="alert">{{ erroOperacao }}</p>
+      <div class="modal-actions">
+        <button type="button" class="cancel-button" (click)="fecharEdicao()" [disabled]="salvando">Cancelar</button>
+        <button type="submit" class="save-button" [disabled]="edicaoForm.invalid || salvando">{{ salvando ? 'Salvando...' : 'Salvar alterações' }}</button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -268,3 +268,25 @@ body{
 .app-content .details-page:not(.modal-mode) {
   min-height: 100%;
 }
+
+
+
+// =============================================
+// LISTRAS ALTERNADAS NAS TABELAS (GLOBAL)
+// Cole no FINAL de src/styles.scss.
+// Nao substitua o styles.scss existente.
+// =============================================
+
+app-extratolist .table-wrapper tbody tr:nth-child(even) td,
+app-entradaslist .table-wrapper tbody tr:nth-child(even) td,
+app-saidaslist .table-wrapper tbody tr:nth-child(even) td,
+app-agenda .table-wrapper tbody tr:nth-child(even) td {
+  background-color: #f3f4f8;
+}
+
+app-extratolist .table-wrapper tbody tr:hover td,
+app-entradaslist .table-wrapper tbody tr:hover td,
+app-saidaslist .table-wrapper tbody tr:hover td,
+app-agenda .table-wrapper tbody tr:hover td {
+  background-color: #ebe8ff;
+}
