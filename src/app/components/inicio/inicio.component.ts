@@ -13,11 +13,10 @@ import {
 type AlertaProxima = 'Hoje' | 'Amanhã' | 'Próximo';
 
 @Component({
-  selector: 'app-inicio',
-  standalone: true,
-  imports: [CommonModule, RouterLink],
-  templateUrl: './inicio.component.html',
-  styleUrl: './inicio.component.scss'
+    selector: 'app-inicio',
+    imports: [CommonModule, RouterLink],
+    templateUrl: './inicio.component.html',
+    styleUrl: './inicio.component.scss'
 })
 export class InicioComponent implements OnInit {
 

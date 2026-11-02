@@ -6,14 +6,13 @@ import { MenuComponent } from '../menu/menu.component';
 import { AuthService } from '../../../services/auth.service';
 
 @Component({
-  selector: 'app-principal',
-  standalone: true,
-  imports: [
-    MenuComponent,
-    RouterOutlet
-  ],
-  templateUrl: './principal.component.html',
-  styleUrl: './principal.component.scss'
+    selector: 'app-principal',
+    imports: [
+        MenuComponent,
+        RouterOutlet
+    ],
+    templateUrl: './principal.component.html',
+    styleUrl: './principal.component.scss'
 })
 export class PrincipalComponent {
 

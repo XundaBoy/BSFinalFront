@@ -28,11 +28,10 @@ import {
 export type { Saida } from '../../../services/saidas.service';
 
 @Component({
-  selector: 'app-saidasdetails',
-  standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
-  templateUrl: './saidasdetails.component.html',
-  styleUrl: './saidasdetails.component.scss'
+    selector: 'app-saidasdetails',
+    imports: [CommonModule, FormsModule, RouterLink],
+    templateUrl: './saidasdetails.component.html',
+    styleUrl: './saidasdetails.component.scss'
 })
 export class SaidasdetailsComponent implements OnInit {
 

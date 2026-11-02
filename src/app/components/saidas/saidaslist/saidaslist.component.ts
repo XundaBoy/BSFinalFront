@@ -20,15 +20,14 @@ import {
 } from '../../../services/saidas.service';
 
 @Component({
-  selector: 'app-saidaslist',
-  standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    SaidasdetailsComponent
-  ],
-  templateUrl: './saidaslist.component.html',
-  styleUrl: './saidaslist.component.scss'
+    selector: 'app-saidaslist',
+    imports: [
+        CommonModule,
+        FormsModule,
+        SaidasdetailsComponent
+    ],
+    templateUrl: './saidaslist.component.html',
+    styleUrl: './saidaslist.component.scss'
 })
 export class SaidaslistComponent implements OnInit {
 

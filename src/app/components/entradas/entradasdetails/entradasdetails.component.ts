@@ -25,11 +25,10 @@ export type { Entrada } from '../../../services/entradas.service';
 type ModoCotacao = 'AUTOMATICA' | 'MANUAL';
 
 @Component({
-  selector: 'app-entradasdetails',
-  standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
-  templateUrl: './entradasdetails.component.html',
-  styleUrl: './entradasdetails.component.scss'
+    selector: 'app-entradasdetails',
+    imports: [CommonModule, FormsModule, RouterLink],
+    templateUrl: './entradasdetails.component.html',
+    styleUrl: './entradasdetails.component.scss'
 })
 export class EntradasdetailsComponent implements OnInit {
 

@@ -30,11 +30,10 @@ type Alerta = {
 };
 
 @Component({
-  selector: 'app-agenda',
-  standalone: true,
-  imports: [CommonModule, FormsModule],
-  templateUrl: './agenda.component.html',
-  styleUrl: './agenda.component.scss'
+    selector: 'app-agenda',
+    imports: [CommonModule, FormsModule],
+    templateUrl: './agenda.component.html',
+    styleUrl: './agenda.component.scss'
 })
 export class AgendaComponent implements OnInit {
   // O componente Pagar passa PAGAR; o Receber passa RECEBER.

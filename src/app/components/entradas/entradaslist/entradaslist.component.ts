@@ -20,15 +20,14 @@ import {
 } from '../../../services/entradas.service';
 
 @Component({
-  selector: 'app-entradaslist',
-  standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    EntradasdetailsComponent
-  ],
-  templateUrl: './entradaslist.component.html',
-  styleUrl: './entradaslist.component.scss'
+    selector: 'app-entradaslist',
+    imports: [
+        CommonModule,
+        FormsModule,
+        EntradasdetailsComponent
+    ],
+    templateUrl: './entradaslist.component.html',
+    styleUrl: './entradaslist.component.scss'
 })
 export class EntradaslistComponent implements OnInit {
 

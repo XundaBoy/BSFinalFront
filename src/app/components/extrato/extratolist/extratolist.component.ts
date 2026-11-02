@@ -38,11 +38,10 @@ interface Movimentacao {
 }
 
 @Component({
-  selector: 'app-extratolist',
-  standalone: true,
-  imports: [CommonModule, FormsModule],
-  templateUrl: './extratolist.component.html',
-  styleUrl: './extratolist.component.scss'
+    selector: 'app-extratolist',
+    imports: [CommonModule, FormsModule],
+    templateUrl: './extratolist.component.html',
+    styleUrl: './extratolist.component.scss'
 })
 export class ExtratolistComponent implements OnInit {
 
