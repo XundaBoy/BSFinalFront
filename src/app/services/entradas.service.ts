@@ -2,6 +2,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 // MOEDAS DISPONIVEIS
 export type Moeda = 'BRL' | 'PYG' | 'USD';
@@ -40,20 +41,19 @@ export class EntradasService {
 
   private http = inject(HttpClient);
 
-  private readonly API =
-    'http://localhost:8080/api/entradas';
+  private apiUrl = `${environment.apiUrl}/entradas`;
 
   // LISTAR
   findAll(): Observable<Entrada[]> {
     return this.http.get<Entrada[]>(
-      `${this.API}/findAll`
+      `${this.apiUrl}/findAll`
     );
   }
 
   // CADASTRAR
   save(entrada: EntradaPayload): Observable<string> {
     return this.http.post(
-      `${this.API}/save`,
+      `${this.apiUrl}/save`,
       entrada,
       { responseType: 'text' }
     );
@@ -66,7 +66,7 @@ export class EntradasService {
   ): Observable<string> {
 
     return this.http.put(
-      `${this.API}/updateById/${id}`,
+      `${this.apiUrl}/updateById/${id}`,
       entrada,
       { responseType: 'text' }
     );
@@ -75,7 +75,7 @@ export class EntradasService {
   // EXCLUIR
   deleteById(id: number): Observable<string> {
     return this.http.delete(
-      `${this.API}/deleteById/${id}`,
+      `${this.apiUrl}/deleteById/${id}`,
       { responseType: 'text' }
     );
   }
